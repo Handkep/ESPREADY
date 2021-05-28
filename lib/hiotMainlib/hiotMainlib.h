@@ -8,6 +8,7 @@
 #include <PubSubClient.h>
 #include <Adafruit_BME280.h>
 #include <PCF8574.h>
+#include <ArduinoOTA.h>
 
 #define ANSI_GREEN "\u001b[32m"
 #define ANSI_YELLOW "\u001b[33m"

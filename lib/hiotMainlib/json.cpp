@@ -180,7 +180,7 @@ String HiotDevice::getESPStateJson(){
     doc["MAC"] = WiFi.macAddress();
     doc["rgb"] = colors.getColorStringRGB(0);
     serializeJsonPretty(doc, buf);
-    Serial.println(buf);
+    // Serial.println(buf);
     return buf;
 }
 

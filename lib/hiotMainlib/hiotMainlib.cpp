@@ -44,12 +44,13 @@ HiotDevice::HiotDevice(){
 // funcloop
 void HiotDevice::loop(){
     esp.loop();
+    ArduinoOTA.handle();
     connectToMQTT();
     connectToWifi();
     publishESPStateJson();
     if(conf.enableLEDs)colors.loop();
+    if(conf.useBME280)publishBMETemp();
     // checkforPins();
-    // publishBMETemp();
     // delay(100);
 }
 
@@ -105,7 +106,9 @@ void HiotDevice::setup(){
     connectToWifi();
     connectToMQTT();
     esp.publish(topic_STATE.c_str(),getESPStateJson().c_str());
-    pinMode(16,INPUT);
+    ArduinoOTA.begin(WiFi.localIP());
+    ArduinoOTA.setHostname(conf.espHostname);
+    // pinMode(16,INPUT);
     // attachInterrupt(digitalPinToInterrupt(16), checkforPins, CHANGE);
 }
 
@@ -223,7 +226,6 @@ void HiotDevice::setLEDPins(int R, int G, int B){
 String HiotDevice::insertHostnameintoVariable(String topic)
 {
     String buf(String(conf.espHostname) + topic);
-    logSerial(buf,0);
     logSerial(buf,0);
     return buf;
 }
@@ -379,6 +381,8 @@ void HiotDevice::connectToMQTT(){
                 esp.subscribe(topic_mode.c_str());
                 esp.subscribe(topic_power.c_str());
                 esp.subscribe(topic_interrupt.c_str());
+                esp.publish(topic_power_state.c_str(),"ON",true);
+                esp.publish(topic_color_state.c_str(),"255,255,255");
             }
             if(conf.usePCF8574){
 
@@ -393,8 +397,6 @@ void HiotDevice::connectToMQTT(){
 
             }
 
-            esp.publish(topic_power_state.c_str(),"ON",true);
-            esp.publish(topic_color_state.c_str(),"255,255,255");
         }else{
             
             logSerial("Connecting to MQTT",4);
@@ -411,10 +413,12 @@ void HiotDevice::publishESPStateJson(){
         _millis_publishESPStateJson = micros();
         esp.publish(topic_STATE.c_str(),getESPStateJson().c_str());
     }
-    if(colors.currentEffect > 0){
-        if(micros() - _millis_publishESPColor >= 0.5*1000000){
-            _millis_publishESPColor = micros();
-            esp.publish(topic_color_state.c_str(),colors.getColorStringRGB(0).c_str());
+    if(conf.enableLEDs){
+        if(colors.currentEffect > 0){
+            if(micros() - _millis_publishESPColor >= 0.5*1000000){
+                _millis_publishESPColor = micros();
+                esp.publish(topic_color_state.c_str(),colors.getColorStringRGB(0).c_str());
+            }
         }
     }
 }

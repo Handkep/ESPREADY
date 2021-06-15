@@ -9,6 +9,8 @@
 #include <Adafruit_BME280.h>
 #include <PCF8574.h>
 #include <ArduinoOTA.h>
+#include <ESP8266mDNS.h>
+#include <NeoPixelBus.h>
 
 #define ANSI_GREEN "\u001b[32m"
 #define ANSI_YELLOW "\u001b[33m"
@@ -45,6 +47,7 @@ class ColorObj
     public:
         void setRGBPins(int R, int G, int B);
         void setRGBWPins(int R, int G, int B, int W);
+        void setup();
         bool convert();
         void setColorString(String color);
         String getColorStringRGB(int i);
@@ -77,6 +80,7 @@ class ColorObj
         int effectIndex;
         void animateColor();
         void writeColor();
+        unsigned long _lastMillis_writeColor_neopixelbus;
         int _countAnimateColor;
         int _countWriteColor;
         unsigned long _millis_printcolors;

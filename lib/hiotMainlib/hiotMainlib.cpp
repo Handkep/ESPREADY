@@ -6,6 +6,8 @@ PubSubClient esp(espClient);
 Config conf;
 PCF8574 PCF(0x20);
 
+
+
 String topic_debug = "/debug";
 String topic_color = "/cmd/color";
 String topic_animationspeed = "/cmd/speed" ;
@@ -57,6 +59,7 @@ void HiotDevice::loop(){
 // funcsetup
 void HiotDevice::setup(){
     Serial.begin(921600);
+    Serial.flush();
     pinMode(ONBORDLED, OUTPUT);
     colors.isColorOnOrOff = 1;
     // colors.setColorString("255,255,255");
@@ -68,6 +71,7 @@ void HiotDevice::setup(){
     logSerial("TEST",3);
     Serial.println("HH   HH   AAA   NN   NN DDDDD   KK  KK EEEEEEE    IIIII  OOOOO  TTTTTTT \nHH   HH  AAAAA  NNN  NN DD  DD  KK KK  EE          III  OO   OO   TTT \nHHHHHHH AA   AA NN N NN DD   DD KKKK   EEEEE       III  OO   OO   TTT \nHH   HH AAAAAAA NN  NNN DD   DD KK KK  EE          III  OO   OO   TTT \nHH   HH AA   AA NN   NN DDDDDD  KK  KK EEEEEEE    IIIII  OOOO0    TTT ");
     delay(1000);
+    colors.setup();
     loadConfig();
     topic_color = insertHostnameintoVariable(topic_color);
     topic_mode = insertHostnameintoVariable(topic_mode);
@@ -95,17 +99,20 @@ void HiotDevice::setup(){
         
         PCF.begin();
         logSerial("Enabling PCF",3);
-        for(int i = 0; i<8;i++){
-            PCF.write(i,LOW);
-            delay(100);
-            PCF.write(i,HIGH);
-            delay(100);
-        }
+        // for(int i = 0; i<8;i++){
+        //     PCF.write(i,LOW);
+        //     delay(100);
+        //     PCF.write(i,HIGH);
+        //     delay(100);
+        // }
         logSerial("Tested Relays",0);
     }
     connectToWifi();
     connectToMQTT();
     esp.publish(topic_STATE.c_str(),getESPStateJson().c_str());
+    if (MDNS.begin(conf.espHostname)) {  //Start mDNS (Bonjourname)
+        logSerial("Started MDNS",4);
+    }
     ArduinoOTA.begin(WiFi.localIP());
     ArduinoOTA.setHostname(conf.espHostname);
     // pinMode(16,INPUT);

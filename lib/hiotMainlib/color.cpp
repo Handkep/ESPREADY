@@ -1,6 +1,12 @@
 #include <hiotMainlib.h>
 
+NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(74, 2);
 
+void ColorObj::setup(){
+
+    strip.Begin();
+    strip.Show();
+}
 void ColorObj::loop(){
     effect();
     animateColor();
@@ -194,7 +200,19 @@ void ColorObj::animateColor(){
 
 
 void ColorObj::writeColor(){
-    analogWrite(RGB_Pin[_countWriteColor] , RGB_write[0][_countWriteColor] );
+    if(conf.useWS2812){
+        if(millis() - _lastMillis_writeColor_neopixelbus > 30){
+            _lastMillis_writeColor_neopixelbus = millis();
+            RgbColor red(RGB_write[0][0], RGB_write[0][1], RGB_write[0][2]);
+            // delay(1);
+            for(int j = 0; j <= 74;j++){
+                strip.SetPixelColor(j,red);
+            }
+            strip.Show();
+        }
+    }else{
+        analogWrite(RGB_Pin[_countWriteColor] , RGB_write[0][_countWriteColor] );
+    }
     _countWriteColor ++;
     if(_countWriteColor > pinAmount){
         _countWriteColor = 0;

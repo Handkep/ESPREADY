@@ -1,6 +1,10 @@
 # ESPREADY
-# Handke IoT
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/Handkep/ESPREADY?include_prereleases)
+![Lines of code](https://img.shields.io/tokei/lines/github/Handkep/ESPREADY)
+
 A Solution to controll all my RGB-LED-strips, collect Temperature data and Irrigate my Garden
+
+
 
 ## about my setup / hardware configuration
 I am using NodeMCU dev boards and custom designed pcb's to build my LED "Driver". I got an Docker instance with Homeassistant, Octoprint, and PiHole (not yet) running on my Raspberry Pi 4B (4GB RAM)

@@ -10,6 +10,7 @@ PCF8574 PCF(0x20);
 
 String topic_debug = "/debug";
 String topic_color = "/cmd/color";
+String topic_cmd_json = "/cmd/json";
 String topic_animationspeed = "/cmd/speed" ;
 String topic_fadespeed = "/cmd/fadespeed";
 String topic_mode = "/cmd/mode";
@@ -74,6 +75,7 @@ void HiotDevice::setup(){
     colors.setup();
     loadConfig();
     topic_color = insertHostnameintoVariable(topic_color);
+    topic_cmd_json = insertHostnameintoVariable(topic_cmd_json);
     topic_mode = insertHostnameintoVariable(topic_mode);
     topic_effect_state = insertHostnameintoVariable(topic_effect_state);
     topic_power = insertHostnameintoVariable(topic_power);
@@ -82,20 +84,24 @@ void HiotDevice::setup(){
     topic_power_state = insertHostnameintoVariable(topic_power_state);
     topic_STATE = insertHostnameintoVariable(topic_STATE);
     topic_interrupt = insertHostnameintoVariable(topic_interrupt);
-    topic_bme_temperature = insertHostnameintoVariable(topic_bme_temperature);
-    topic_bme_humidity = insertHostnameintoVariable(topic_bme_humidity);
-    topic_bme_pressure = insertHostnameintoVariable(topic_bme_pressure);
-    topic_bme_altitude = insertHostnameintoVariable(topic_bme_altitude);
-    topic_irrigation_Zone1 = insertHostnameintoVariable(topic_irrigation_Zone1);
-    topic_irrigation_Zone2 = insertHostnameintoVariable(topic_irrigation_Zone2);
-    topic_irrigation_Zone3 = insertHostnameintoVariable(topic_irrigation_Zone3);
-    topic_irrigation_Zone4 = insertHostnameintoVariable(topic_irrigation_Zone4);
-    topic_irrigation_Zone5 = insertHostnameintoVariable(topic_irrigation_Zone5);
-    topic_irrigation_Zone6 = insertHostnameintoVariable(topic_irrigation_Zone6);
-    topic_irrigation_Zone7 = insertHostnameintoVariable(topic_irrigation_Zone7);
-    topic_irrigation_Zone8 = insertHostnameintoVariable(topic_irrigation_Zone8);
+
+    if(conf.useBME280){
+        topic_bme_temperature = insertHostnameintoVariable(topic_bme_temperature);
+        topic_bme_humidity = insertHostnameintoVariable(topic_bme_humidity);
+        topic_bme_pressure = insertHostnameintoVariable(topic_bme_pressure);
+        topic_bme_altitude = insertHostnameintoVariable(topic_bme_altitude);
+    }
     
     if(conf.usePCF8574){
+
+        topic_irrigation_Zone1 = insertHostnameintoVariable(topic_irrigation_Zone1);
+        topic_irrigation_Zone2 = insertHostnameintoVariable(topic_irrigation_Zone2);
+        topic_irrigation_Zone3 = insertHostnameintoVariable(topic_irrigation_Zone3);
+        topic_irrigation_Zone4 = insertHostnameintoVariable(topic_irrigation_Zone4);
+        topic_irrigation_Zone5 = insertHostnameintoVariable(topic_irrigation_Zone5);
+        topic_irrigation_Zone6 = insertHostnameintoVariable(topic_irrigation_Zone6);
+        topic_irrigation_Zone7 = insertHostnameintoVariable(topic_irrigation_Zone7);
+        topic_irrigation_Zone8 = insertHostnameintoVariable(topic_irrigation_Zone8);
         
         PCF.begin();
         logSerial("Enabling PCF",3);
@@ -271,7 +277,35 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
     }
     logSerial("MQTT", ANSI_CYAN,buf + recvPayload + String(ANSI_RST));
 
-    if(recvTopic == topic_color){
+    // for json mqtt
+    if(recvTopic == topic_cmd_json){
+        StaticJsonDocument<512> doc;
+        // logSerial("TRIGERED JSONCALLBACK",0);
+        DeserializationError error = deserializeJson(doc, recvPayload);
+        if(error)logSerial("deserialization",2);
+
+        logSerial("printing json payload serial",0);
+        serializeJsonPretty(doc, Serial);
+        Serial.println();
+        //Read sent power state
+        if(doc.containsKey("state")){
+            if(colors.isColorOnOrOff){
+                String jsonbuf = doc["state"];
+                if( jsonbuf == "OFF"){
+                    backupColor = colors.getColorStringRGB(0);
+                    backupEffect = colors.currentEffect;
+                    colors.isColorOnOrOff = 0;
+                    colors.setColorString("0,0,0");
+                    esp.publish(topic_power_state.c_str(),recvPayload.c_str());
+                    logSerial("ON to OFF",0);
+                }
+            }    
+        } else {
+            logSerial("reading state",2);
+        }
+
+        // |power|
+    }else if(recvTopic == topic_color){
         colors.setColorString(recvPayload);
         esp.publish(topic_color_state.c_str(),recvPayload.c_str());
         esp.publish(topic_effect_state.c_str(),"COLOR");
@@ -385,6 +419,7 @@ void HiotDevice::connectToMQTT(){
             if(conf.enableLEDs){
             
                 esp.subscribe(topic_color.c_str());
+                esp.subscribe(topic_cmd_json.c_str());
                 esp.subscribe(topic_mode.c_str());
                 esp.subscribe(topic_power.c_str());
                 esp.subscribe(topic_interrupt.c_str());

@@ -12,7 +12,7 @@ String topic_debug = "/debug";
 String topic_color = "/cmd/color";
 String topic_cmd_json = "/cmd/json";
 String topic_animationspeed = "/cmd/speed" ;
-String topic_fadespeed = "/cmd/fadespeed";
+String topic_fadespeed = "/state/fadespeed";
 String topic_mode = "/cmd/mode";
 String topic_power = "/cmd/power";
 String topic_irrigation_Zone1 = "/cmd/irrigation/zone1";
@@ -25,6 +25,7 @@ String topic_irrigation_Zone7 = "/cmd/irrigation/zone7";
 String topic_irrigation_Zone8 = "/cmd/irrigation/zone8";
 String topic_reset = "/reset";
 String topic_power_state = "/state/power";
+String topic_state_json = "/state/json";
 String topic_effect_state = "/state/mode";
 String topic_color_state = "/state/color";
 String topic_relais_state = "/state/relais";
@@ -50,7 +51,7 @@ void HiotDevice::loop(){
     ArduinoOTA.handle();
     connectToMQTT();
     connectToWifi();
-    publishESPStateJson();
+    publishESPStateJsonRepetitive();
     if(conf.enableLEDs)colors.loop();
     if(conf.useBME280)publishBMETemp();
     // checkforPins();
@@ -59,7 +60,7 @@ void HiotDevice::loop(){
 
 // funcsetup
 void HiotDevice::setup(){
-    Serial.begin(921600);
+    Serial.begin(115200);
     Serial.flush();
     pinMode(ONBORDLED, OUTPUT);
     colors.isColorOnOrOff = 1;
@@ -81,9 +82,11 @@ void HiotDevice::setup(){
     topic_power = insertHostnameintoVariable(topic_power);
     topic_LWT = insertHostnameintoVariable(topic_LWT);
     topic_color_state = insertHostnameintoVariable(topic_color_state);
+    topic_state_json = insertHostnameintoVariable(topic_state_json);
     topic_power_state = insertHostnameintoVariable(topic_power_state);
     topic_STATE = insertHostnameintoVariable(topic_STATE);
     topic_interrupt = insertHostnameintoVariable(topic_interrupt);
+    topic_fadespeed = insertHostnameintoVariable(topic_fadespeed);
 
     if(conf.useBME280){
         topic_bme_temperature = insertHostnameintoVariable(topic_bme_temperature);
@@ -223,12 +226,15 @@ void HiotDevice::setLEDPins(int R, int G, int B){
 	pinMode(R,OUTPUT);
 	pinMode(G,OUTPUT);
 	pinMode(B,OUTPUT);
-    analogWrite(R,1024);
-    analogWrite(G,1024);
-    analogWrite(B,1024);
-    colors.RGB[0][0] = 1024;
-    colors.RGB[0][1] = 1024;
-    colors.RGB[0][2] = 1024;
+    analogWrite(R,255);
+    analogWrite(G,255);
+    analogWrite(B,255);
+    colors.RGB[0][0] = 255;
+    colors.RGB[0][1] = 255;
+    colors.RGB[0][2] = 255;
+    colors.RGB_write[0][0] = 255;
+    colors.RGB_write[0][1] = 255;
+    colors.RGB_write[0][2] = 255;
     colors.RGB_Pin[0] = R;
     colors.RGB_Pin[1] = G;
     colors.RGB_Pin[2] = B;
@@ -294,16 +300,20 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
                     backupEffect = colors.currentEffect;
                     colors.isColorOnOrOff = 0;
                     colors.setColorString("0,0,0");
-                    esp.publish(topic_power_state.c_str(),recvPayload.c_str());
+                    // esp.publish(topic_power_state.c_str(),recvPayload.c_str());
                     logSerial("ON to OFF",0);
+                    esp.publish(topic_state_json.c_str(),"{\"state\": \"OFF\"}");
                 }
             }else{
                 if(jsonbuf == "ON"){
                     colors.isColorOnOrOff = 1;
                     colors.setColorString(backupColor);
-                    colors.currentEffect = backupEffect.toInt();
-                    esp.publish(topic_power_state.c_str(),recvPayload.c_str());
+                    colors.currentEffect = backupEffect;
+                    // esp.publish(topic_power_state.c_str(),recvPayload.c_str());
+                    logSerial(String(colors.currentEffect),0);
+                    logSerial(String(backupEffect),0);
                     logSerial("OFF to ON",0);
+                    esp.publish(topic_state_json.c_str(),"{\"state\": \"ON\"}");
                 }
             }    
         } 
@@ -316,9 +326,21 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
                 String colorbuf = String(colordoc["r"]) + "," + String(colordoc["g"]) + "," + String(colordoc["b"]);
                 // String colorbuf = colordoc["r"] + "," + colordoc["g"] + "," + colordoc["b"];
                 colors.setColorString(colorbuf);
+                String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"color\":" + String(doc["color"]) + "}";
+                esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
             }
         }
-
+        if(doc.containsKey("fadespeed")){
+            colors.fadespeed = doc["fadespeed"];
+            esp.publish(topic_fadespeed.c_str(),String(colors.fadespeed).c_str());
+            colors.fadespeed = pow(colors.fadespeed,3)/50;
+        }
+        if(doc.containsKey("effect")){
+            if(doc["effect"] == "JUMP") colors.currentEffect = 1;
+            if(doc["effect"] == "FADE") colors.currentEffect = 2;
+            if(doc["effect"] == "STROBE") colors.currentEffect = 3;
+        }
+    // not in use \/
     }else if(recvTopic == topic_color){
         colors.setColorString(recvPayload);
         esp.publish(topic_color_state.c_str(),recvPayload.c_str());
@@ -327,6 +349,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
     }else if(recvTopic == topic_mode){
         if(recvPayload == "JUMP") colors.currentEffect = 1;
         if(recvPayload == "FADE") colors.currentEffect = 2;
+        if(recvPayload == "STROBE") colors.currentEffect = 3;
         esp.publish(topic_effect_state.c_str(),recvPayload.c_str());
 
         // |power|
@@ -344,7 +367,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             if(recvPayload == "ON"){
                 colors.isColorOnOrOff = 1;
                 colors.setColorString(backupColor);
-                colors.currentEffect = backupEffect.toInt();
+                colors.currentEffect = backupEffect;
                 esp.publish(topic_power_state.c_str(),recvPayload.c_str());
                 logSerial("OFF to ON",0);
             }
@@ -424,8 +447,10 @@ void HiotDevice::connectToMQTT(){
         esp.setServer(conf.mqttBrokerIp,conf.mqttBrokerPort);
         esp.setCallback(std::bind( &HiotDevice::mqttCallback, this, _1,_2,_3));
 
-        logSerial(String("(Re)Connectig to MQTT at ")+String(conf.mqttBrokerIp),3);
-        if(esp.connect(conf.espHostname, conf.mqttBrokerUser , conf.mqttBrokerPassword ,topic_LWT.c_str(),2,true,"offline")){
+        logSerial(String("(Re)Connectig to MQTT at ")+String(conf.mqttBrokerIp)+ "  "+String(esp.state()),3);
+        // logSerial(String(esp.state()),2);
+        if(esp.connect(conf.espHostname, topic_LWT.c_str(),2,true,"offline")){
+        // if(esp.connect(conf.espHostname, conf.mqttBrokerUser , conf.mqttBrokerPassword ,topic_LWT.c_str(),2,true,"offline")){
             
             logSerial("Connected to MQTT",4);
             alertBlink(10,100,4);
@@ -437,6 +462,10 @@ void HiotDevice::connectToMQTT(){
                 esp.subscribe(topic_mode.c_str());
                 esp.subscribe(topic_power.c_str());
                 esp.subscribe(topic_interrupt.c_str());
+                esp.publish(topic_fadespeed.c_str(),"45");
+                String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"color\":" + getESPColorJson() + "}";
+                // String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"color\":{ \"r\": 255, \"g\": 255, \"b\":255}";
+                esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
                 esp.publish(topic_power_state.c_str(),"ON",true);
                 esp.publish(topic_color_state.c_str(),"255,255,255");
             }
@@ -463,17 +492,18 @@ void HiotDevice::connectToMQTT(){
 
 
 
-// funcpublishESPStateJson
-void HiotDevice::publishESPStateJson(){
-    if(micros() - _millis_publishESPStateJson >= 30*1000000){
-        _millis_publishESPStateJson = micros();
+// funcpublishESPStateJsonRepetitive
+void HiotDevice::publishESPStateJsonRepetitive(){
+    if(micros() - _millis_publishESPStateJsonRepetitive >= 30*1000000){
+        _millis_publishESPStateJsonRepetitive = micros();
         esp.publish(topic_STATE.c_str(),getESPStateJson().c_str());
     }
     if(conf.enableLEDs){
         if(colors.currentEffect > 0){
             if(micros() - _millis_publishESPColor >= 0.5*1000000){
                 _millis_publishESPColor = micros();
-                esp.publish(topic_color_state.c_str(),colors.getColorStringRGB(0).c_str());
+                String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"color\":" + getESPColorJson() + "}";
+                esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
             }
         }
     }

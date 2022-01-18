@@ -66,14 +66,18 @@ class ColorObj
         unsigned long fade_millis; //could be deleted
         int pinAmount;
         int jumpcolors[3][3] = {{255,0,0},{0,255,0},{0,0,255}};
+        int strobecolors[2][3] = {{255,255,255},{0,0,0}};
         int jumplen = 3;
+        int strobelen = 2;
         int currentEffect;
+        unsigned long fadespeed = 2000;
         int ledIndex;
         bool isColorOnOrOff;
     private:
         // effects:
 
         void jump();
+        void strobe();
         void fade();
         void effect();
         unsigned long _millis_Effect;
@@ -98,7 +102,7 @@ class HiotDevice{
         void setLEDPins(int R, int G, int B);
     private:
         String backupColor;
-        String backupEffect;
+        int backupEffect;
         String interruptColor;
         String interruptEffect;
         ColorObj colors;
@@ -124,8 +128,9 @@ class HiotDevice{
         // loading config
         void loadConfig();
         String getESPStateJson();
-        void publishESPStateJson();
-            unsigned long _millis_publishESPStateJson = 0;
+        String getESPColorJson();
+        void publishESPStateJsonRepetitive();
+            unsigned long _millis_publishESPStateJsonRepetitive = 0;
             unsigned long _millis_publishESPColor = 0;
         void publishBMETemp();
             Adafruit_BME280 sensor;

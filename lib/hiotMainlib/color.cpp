@@ -78,10 +78,10 @@ void ColorObj::setColorString(String color){
         RGB[j][1] = color.substring(commaIndex + 1, secondCommaIndex).toInt();
         RGB[j][2] = color.substring(secondCommaIndex + 1).toInt();
 
-        Serial.println(j);
-        Serial.println(j);
-        Serial.println(j);
-        Serial.println(j);
+        // Serial.println(j);
+        // Serial.println(j);
+        // Serial.println(j);
+        // Serial.println(j);
 
         if(!conf.useWS2812){
 
@@ -113,6 +113,7 @@ String ColorObj::getColorStringRGBW(int i){
 void ColorObj::jump(){
 
     if(millis() - _millis_Effect >= 1*1000){
+        Serial.println("CHANGING COLOR");
         _millis_Effect = millis();
         for(int j = 0; j < ledAmmount ; j++ ){
             for (int i = 0; i < 3;i++){
@@ -147,7 +148,6 @@ void ColorObj::fade(){
 }
 
 void ColorObj::effect(){
-
     switch (currentEffect){
         case 1:
             jump();

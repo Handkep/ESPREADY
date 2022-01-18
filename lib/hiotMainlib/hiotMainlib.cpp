@@ -270,7 +270,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
 
     String recvPayload;
     String recvTopic(topic);
-    String buf = "Message Arrived in Topic: " + String(ANSI_CYAN) + recvTopic + String(ANSI_RST) + String(" Payload: ") + String(ANSI_CYAN);
+    String buf = "Message Arrived in Topic: " + String(ANSI_CYAN) + recvTopic + String(ANSI_RST) + String(" Payload: \"") + String(ANSI_CYAN);
     
     for (int i = 0; i < length; i++) {
         recvPayload += (char)payload[i];
@@ -280,18 +280,16 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
     // for json mqtt
     if(recvTopic == topic_cmd_json){
         StaticJsonDocument<512> doc;
-        // logSerial("TRIGERED JSONCALLBACK",0);
         DeserializationError error = deserializeJson(doc, recvPayload);
         if(error)logSerial("deserialization",2);
-
-        logSerial("printing json payload serial",0);
-        serializeJsonPretty(doc, Serial);
-        Serial.println();
-        //Read sent power state
+        // logSerial("printing json payload serial",0);
+        // serializeJsonPretty(doc, Serial);
+        // Serial.println();
+        //Read sent power state, logic is the same as |power|
         if(doc.containsKey("state")){
+            String jsonbuf = doc["state"];
             if(colors.isColorOnOrOff){
-                String jsonbuf = doc["state"];
-                if( jsonbuf == "OFF"){
+                if(jsonbuf == "OFF"){
                     backupColor = colors.getColorStringRGB(0);
                     backupEffect = colors.currentEffect;
                     colors.isColorOnOrOff = 0;
@@ -299,23 +297,39 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
                     esp.publish(topic_power_state.c_str(),recvPayload.c_str());
                     logSerial("ON to OFF",0);
                 }
+            }else{
+                if(jsonbuf == "ON"){
+                    colors.isColorOnOrOff = 1;
+                    colors.setColorString(backupColor);
+                    colors.currentEffect = backupEffect.toInt();
+                    esp.publish(topic_power_state.c_str(),recvPayload.c_str());
+                    logSerial("OFF to ON",0);
+                }
             }    
-        } else {
-            logSerial("reading state",2);
+        } 
+        if(doc.containsKey("color")) {
+            StaticJsonDocument<512> colordoc;
+            String jsonbuf = doc["color"];
+            DeserializationError error = deserializeJson(colordoc, jsonbuf);
+            if(error)logSerial("deserialization",2);
+            if(colordoc.containsKey("r") && colordoc.containsKey("g") && colordoc.containsKey("b")){
+                String colorbuf = String(colordoc["r"]) + "," + String(colordoc["g"]) + "," + String(colordoc["b"]);
+                // String colorbuf = colordoc["r"] + "," + colordoc["g"] + "," + colordoc["b"];
+                colors.setColorString(colorbuf);
+            }
         }
 
-        // |power|
     }else if(recvTopic == topic_color){
         colors.setColorString(recvPayload);
         esp.publish(topic_color_state.c_str(),recvPayload.c_str());
         esp.publish(topic_effect_state.c_str(),"COLOR");
 
     }else if(recvTopic == topic_mode){
-        if(recvPayload == "JUMP") recvPayload = 1;
-        if(recvPayload == "FADE") recvPayload = 2;
-        colors.currentEffect = recvPayload.toInt();
+        if(recvPayload == "JUMP") colors.currentEffect = 1;
+        if(recvPayload == "FADE") colors.currentEffect = 2;
         esp.publish(topic_effect_state.c_str(),recvPayload.c_str());
 
+        // |power|
     }else if(recvTopic == topic_power){
         if(colors.isColorOnOrOff){
             if(recvPayload == "OFF"){

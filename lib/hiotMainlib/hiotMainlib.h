@@ -65,7 +65,7 @@ class ColorObj
         unsigned long fade_micros[4];
         unsigned long fade_millis; //could be deleted
         int pinAmount;
-        int jumpcolors[3][3] = {{1024,0,0},{0,1024,0},{0,0,1024}};
+        int jumpcolors[3][3] = {{255,0,0},{0,255,0},{0,0,255}};
         int jumplen = 3;
         int currentEffect;
         int ledIndex;

@@ -154,7 +154,7 @@ void ColorObj::fade(){
         for(int j = 0; j < ledAmmount ; j++ ){
             for (int i = 0; i < 3;i++){
                 RGB[j][i] = jumpcolors[effectIndex][i];
-                fadems[j][i] = calculatems(fadespeed*1100, RGB[j][i], RGB_write[j][i]);
+                fadems[j][i] = calculatems(fadespeed*1000, RGB[j][i], RGB_write[j][i]);
             }
         }
         effectIndex++;

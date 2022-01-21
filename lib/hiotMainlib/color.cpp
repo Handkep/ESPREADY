@@ -99,7 +99,7 @@ void ColorObj::setColorString(String color){
         //     Serial.print(RGB[j][i]);
         // }
     }
-    Serial.println();
+    // Serial.println();
 }
 String ColorObj::getColorStringRGB(int i){
     return String(RGB_write[i][0]) + String(",") + String(RGB_write[i][1]) + String(",") + String(RGB_write[i][2]);

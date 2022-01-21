@@ -1,8 +1,8 @@
 {
-    "hostname2":"Schreibtisch_Unten",
+    "hostname0":"Schreibtisch_Unten",
     "hostname4":"Schreibtisch",
     "hostname3":"FensterTreppe",
-    "hostname0":"Enclosure",
+    "hostname":"Enclosure",
     "hostname1":"Bewaesserung",
-    "hostname":"v4"
+    "hostname2":"v4"
 }

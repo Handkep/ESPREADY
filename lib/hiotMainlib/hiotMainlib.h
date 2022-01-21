@@ -11,6 +11,7 @@
 #include <ArduinoOTA.h>
 #include <ESP8266mDNS.h>
 #include <NeoPixelBus.h>
+#include "ESP8266httpUpdate.h"
 
 #define ANSI_GREEN "\u001b[32m"
 #define ANSI_YELLOW "\u001b[33m"

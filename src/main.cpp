@@ -2,6 +2,9 @@
 #include <hiotMainlib.h>
 
 
+// test
+
+
 HiotDevice device;
 
 

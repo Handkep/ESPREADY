@@ -1,6 +1,8 @@
 #include <hiotMainlib.h>
 
 
+
+
 WiFiClient espClient;
 PubSubClient esp(espClient);
 Config conf;
@@ -49,8 +51,8 @@ HiotDevice::HiotDevice(){
 void HiotDevice::loop(){
     esp.loop();
     ArduinoOTA.handle();
-    connectToMQTT();
     connectToWifi();
+    connectToMQTT();
     publishESPStateJsonRepetitive();
     if(conf.enableLEDs)colors.loop();
     if(conf.useBME280)publishBMETemp();
@@ -119,9 +121,7 @@ void HiotDevice::setup(){
     connectToWifi();
     connectToMQTT();
     esp.publish(topic_STATE.c_str(),getESPStateJson().c_str());
-    if (MDNS.begin(conf.espHostname)) {  //Start mDNS (Bonjourname)
-        logSerial("Started MDNS",4);
-    }
+
     ArduinoOTA.begin(WiFi.localIP());
     ArduinoOTA.setHostname(conf.espHostname);
     // pinMode(16,INPUT);
@@ -229,15 +229,33 @@ void HiotDevice::setLEDPins(int R, int G, int B){
     analogWrite(R,255);
     analogWrite(G,255);
     analogWrite(B,255);
-    colors.RGB[0][0] = 255;
-    colors.RGB[0][1] = 255;
-    colors.RGB[0][2] = 255;
-    colors.RGB_write[0][0] = 255;
-    colors.RGB_write[0][1] = 255;
-    colors.RGB_write[0][2] = 255;
-    colors.RGB_Pin[0] = R;
-    colors.RGB_Pin[1] = G;
-    colors.RGB_Pin[2] = B;
+    colors.RGBW[0][0] = 255;
+    colors.RGBW[0][1] = 255;
+    colors.RGBW[0][2] = 255;
+    colors.RGBW_write[0][0] = 255;
+    colors.RGBW_write[0][1] = 255;
+    colors.RGBW_write[0][2] = 255;
+    colors.RGBW_Pin[0] = R;
+    colors.RGBW_Pin[1] = G;
+    colors.RGBW_Pin[2] = B;
+
+}
+
+// funcsetLEDPins
+void HiotDevice::setLEDPinsRGBW(int R, int G, int B, int W){
+
+    colors.pinAmount = 4;    
+	pinMode(R,OUTPUT);
+	pinMode(G,OUTPUT);
+	pinMode(B,OUTPUT);
+	pinMode(W,OUTPUT);
+    analogWrite(W,255);
+    colors.RGBW[0][3] = 255;
+    colors.RGBW_write[0][3] = 255;
+    colors.RGBW_Pin[0] = R;
+    colors.RGBW_Pin[1] = G;
+    colors.RGBW_Pin[2] = B;
+    colors.RGBW_Pin[3] = W;
 
 }
 
@@ -255,6 +273,7 @@ void HiotDevice::connectToWifi(){
         delay(100);
         WiFi.disconnect();
         WiFi.mode(WIFI_STA);
+        WiFi.hostname(conf.espHostname);
         WiFi.begin(conf.ssid, conf.wifiPassword);
         logSerial(String("(Re)Connectig to Wifi at ")+String(conf.ssid),3);
         while (WiFi.status() != WL_CONNECTED)
@@ -265,9 +284,18 @@ void HiotDevice::connectToWifi(){
         // Serial.println();
         logSerial(String("Connected to Wifi at ")+String(conf.ssid),4);
         logSerialPretty("Wifi-Info",String("IP: ") + String(WiFi.localIP().toString()) + String("\n") + 
-                        String("Hostname: ") + String(conf.espHostname) + String("\n") + 
+                        String("Hostname: ") + WiFi.hostname() + String("\n") + 
                         String("MAC: ") + WiFi.macAddress());
         alertBlink(5, 80,3);
+
+        // hostname is not working
+        // MDNS.setHostname(conf.espHostname);
+        if (MDNS.begin(conf.espHostname)) {  //Start mDNS (Bonjourname)
+            // MDNS.addService("http","tcp", 80);
+            logSerial("Started MDNS: "+String(WiFi.getHostname()) ,4);
+        }else{
+            logSerial("MDNS", ERROR);
+        }
     }
 }
 
@@ -360,13 +388,13 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
     // ESPhttpUpdate.update(espClient, "192.168.2.109", 5000, "/esp");
 
 
-    t_httpUpdate_return ret = ESPhttpUpdate.update(espClient, "192.168.2.109", 5000, "/esp", "v1");
+    t_httpUpdate_return ret = ESPhttpUpdate.update(espClient, "192.168.2.115", 5000, "/esp", "v1.0.1");
     switch(ret) {
         case HTTP_UPDATE_FAILED:
-            Serial.println("[update] Update failed.");
+            logSerial("Update failed", ERROR);
             break;
         case HTTP_UPDATE_NO_UPDATES:
-            Serial.println("[update] Update no Update.");
+            logSerial("no update", INFO);
             break;
         case HTTP_UPDATE_OK:
             Serial.println("[update] Update ok."); // may not be called since we reboot the ESP
@@ -503,11 +531,12 @@ void HiotDevice::connectToMQTT(){
 
             }
 
-        }else{
-            
-            logSerial("Connecting to MQTT",4);
-            delay(500);
         }
+        // else{
+            
+        //     logSerial("Connecting to MQTT",4);
+        //     delay(500);
+        // }
     }
 }
 

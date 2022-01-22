@@ -1,6 +1,9 @@
 #ifndef HIOTMAINLIB_H
 #define HIOTMAINLIB_H
 
+#define VERSION "1.0.1<"
+
+
 #include <Arduino.h>
 #include <Arduinojson.h>
 #include <ESP8266WiFi.h>
@@ -19,6 +22,12 @@
 #define ANSI_CYAN "\u001b[96m"
 #define ANSI_RST "\u001b[0m"
 #define ONBORDLED 16
+
+#define DEBUG 0
+#define WARN 1
+#define ERROR 2
+#define INFO 3
+#define DONE 4
 
 // bool pin1;
 
@@ -66,8 +75,8 @@ class ColorObj
         unsigned long fade_micros[4];
         unsigned long fade_millis; //could be deleted
         int pinAmount;
-        int jumpcolors[3][3] = {{255,0,0},{0,255,0},{0,0,255}};
-        int strobecolors[2][3] = {{255,255,255},{0,0,0}};
+        int jumpcolors[3][4] = {{255,0,0,0},{0,255,0,0},{0,0,255,0}};
+        int strobecolors[2][4] = {{255,255,255,255},{0,0,0}};
         int jumplen = 3;
         int strobelen = 2;
         int currentEffect;
@@ -101,6 +110,7 @@ class HiotDevice{
         void loop();
         void setup();
         void setLEDPins(int R, int G, int B);
+        void setLEDPinsRGBW(int R, int G, int B, int W);
     private:
         String backupColor;
         int backupEffect;

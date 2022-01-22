@@ -20,7 +20,11 @@ void ColorObj::setRGBPins(int R, int G, int B){
 // funcconvert
 bool ColorObj::convert()
 {
+    // Serial.println("ASDF");
     for(int i = 0; i < ledAmmount ; i++ ){
+        RGB[i][0] = RGBW[i][0];
+        RGB[i][1] = RGBW[i][1];
+        RGB[i][2] = RGBW[i][2];
         if((RGB[i][0] <= RGB[i][1]) && (RGB[i][0] <= RGB[i][2])){
             RGBW[i][0] = RGB[i][0] - RGB[i][0];
             RGBW[i][1] = RGB[i][1] - RGB[i][0];
@@ -74,9 +78,12 @@ void ColorObj::setColorString(String color){
     int commaIndex = color.indexOf(',');
     int secondCommaIndex = color.indexOf(',', commaIndex + 1);
     for(int j = 0; j < ledAmmount ; j++ ){
-        RGB[j][0] = color.substring(0, commaIndex).toInt();
-        RGB[j][1] = color.substring(commaIndex + 1, secondCommaIndex).toInt();
-        RGB[j][2] = color.substring(secondCommaIndex + 1).toInt();
+        RGBW[j][0] = color.substring(0, commaIndex).toInt();
+        RGBW[j][1] = color.substring(commaIndex + 1, secondCommaIndex).toInt();
+        RGBW[j][2] = color.substring(secondCommaIndex + 1).toInt();
+        // RGB[j][0] = color.substring(0, commaIndex).toInt();
+        // RGB[j][1] = color.substring(commaIndex + 1, secondCommaIndex).toInt();
+        // RGB[j][2] = color.substring(secondCommaIndex + 1).toInt();
 
         // Serial.println(j);
         // Serial.println(j);
@@ -89,8 +96,11 @@ void ColorObj::setColorString(String color){
         //     RGB[j][1] *= 4;
         //     RGB[j][2] *= 4;
         // }
-        for(int i = 0;i<3;i++){
-            fadems[j][i] = calculatems(1000000, RGB[j][i], RGB_write[j][i]);
+        if(conf.useRGBW){
+            convert();
+        }
+        for(int i = 0;i<pinAmount;i++){
+            fadems[j][i] = calculatems(1000000, RGBW[j][i], RGBW_write[j][i]);
         }
         // Serial.print("Colors.RGB:");
         // for(int i=0;i<3;i++){
@@ -99,6 +109,11 @@ void ColorObj::setColorString(String color){
         //     Serial.print(RGB[j][i]);
         // }
     }
+    //     for(int i = 0;i<pinAmount;i++){
+    //         fadems[0][i] = calculatems(1000000, RGBW[0][i], RGBW_write[0][i]);
+    //     }
+    //     Serial.println("sdfjkfdljkio");
+    // }
     // Serial.println();
 }
 String ColorObj::getColorStringRGB(int i){
@@ -116,8 +131,8 @@ void ColorObj::jump(){
         // Serial.println("CHANGING COLOR");
         _millis_Effect = millis();
         for(int j = 0; j < ledAmmount ; j++ ){
-            for (int i = 0; i < 3;i++){
-                RGB[j][i] = jumpcolors[effectIndex][i];
+            for (int i = 0; i < pinAmount;i++){
+                RGBW[j][i] = jumpcolors[effectIndex][i];
                 fadems[j][i] = 0;
             }
         }
@@ -134,8 +149,8 @@ void ColorObj::strobe(){
         // Serial.println("CHANGING COLOR");
         _millis_Effect = millis();
         for(int j = 0; j < ledAmmount ; j++ ){
-            for (int i = 0; i < 3;i++){
-                RGB[j][i] = strobecolors[effectIndex][i];
+            for (int i = 0; i < pinAmount;i++){
+                RGBW[j][i] = strobecolors[effectIndex][i];
                 fadems[j][i] = 0;
             }
         }
@@ -152,9 +167,9 @@ void ColorObj::fade(){
     if(millis() - _millis_Effect >= fadespeed){
         _millis_Effect = millis();
         for(int j = 0; j < ledAmmount ; j++ ){
-            for (int i = 0; i < 3;i++){
-                RGB[j][i] = jumpcolors[effectIndex][i];
-                fadems[j][i] = calculatems(fadespeed*1000, RGB[j][i], RGB_write[j][i]);
+            for (int i = 0; i < pinAmount;i++){
+                RGBW[j][i] = jumpcolors[effectIndex][i];
+                fadems[j][i] = calculatems(fadespeed*1000, RGBW[j][i], RGBW_write[j][i]);
             }
         }
         effectIndex++;
@@ -197,29 +212,53 @@ void ColorObj::animateColor(){
     //         Serial.println();
     //     }
     // }
-    if (RGB_write[j][i] < RGB[j][i] && fadems[j][i] > 0){
+
+    if (RGBW_write[j][i] < RGBW[j][i] && fadems[j][i] > 0){
 
                 
         if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
 
             _lastMillis_AnimateColors[j][i] = micros();
             // animate_color_is_not_Blocking = false;
-            RGB_write[j][i]++;
+            RGBW_write[j][i]++;
         }
-    }else if(RGB_write[j][i] > RGB[j][i] && fadems[j][i] > 0){
+    }else if(RGBW_write[j][i] > RGBW[j][i] && fadems[j][i] > 0){
         
         if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
 
             _lastMillis_AnimateColors[j][i] = micros();
             // animate_color_is_not_Blocking = false;
-            RGB_write[j][i]--;
+            RGBW_write[j][i]--;
         }             
     }else{
-        RGB_write[j][i] = RGB[j][i];
+        RGBW_write[j][i] = RGBW[j][i];
         //animate_color_is_not_Blocking = true;
     }
+
+        // if (RGB_write[j][i] < RGB[j][i] && fadems[j][i] > 0){
+
+                    
+        //     if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+
+        //         _lastMillis_AnimateColors[j][i] = micros();
+        //         // animate_color_is_not_Blocking = false;
+        //         RGB_write[j][i]++;
+        //     }
+        // }else if(RGB_write[j][i] > RGB[j][i] && fadems[j][i] > 0){
+            
+        //     if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+
+        //         _lastMillis_AnimateColors[j][i] = micros();
+        //         // animate_color_is_not_Blocking = false;
+        //         RGB_write[j][i]--;
+        //     }             
+        // }else{
+        //     RGB_write[j][i] = RGB[j][i];
+        //     //animate_color_is_not_Blocking = true;
+        // }
+    // }
     i ++;
-    if(i > 3){
+    if(i > pinAmount){
         i = 0;
     }
     _countAnimateColor = i;
@@ -243,20 +282,30 @@ void ColorObj::writeColor(){
             }
             strip.Show();
         }
-    }else{
-        analogWrite(RGB_Pin[_countWriteColor] , RGB_write[0][_countWriteColor] );
+    // }else if(conf.useRGBW){
+    //     analogWrite(RGBW_Pin[_countWriteColor] , RGBW_write[0][_countWriteColor] );
+    } else {
+        analogWrite(RGBW_Pin[_countWriteColor] , RGBW_write[0][_countWriteColor] );
     }
     _countWriteColor ++;
     if(_countWriteColor > pinAmount){
         _countWriteColor = 0;
     }
-    // if(millis() - _millis_printcolors >= 1*100){
-    //     _millis_printcolors = millis();
-    //     for(int i=0;i<3;i++)
-    //     {
-    //         Serial.print(RGB_write[0][i]);
-    //         Serial.print("\t");
-    //     }
-    //     Serial.println();
-    // }
+    if(millis() - _millis_printcolors >= 1*100){
+        _millis_printcolors = millis();
+        for(int i=0;i<3;i++)
+        {
+            Serial.print(RGB_write[0][i]);
+            Serial.print("\t");
+        }
+        Serial.print("\t");
+        Serial.print("\t");
+        Serial.print("\t");
+        for(int i=0;i<pinAmount;i++)
+        {
+            Serial.print(RGBW_write[0][i]);
+            Serial.print("\t");
+        }
+        Serial.println();
+    }
 }

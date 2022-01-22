@@ -1,7 +1,7 @@
 {
     "debug":  true,
     "enableLEDs": true,
-    "rgbw":  false,
+    "rgbw":  true,
     "ws2812": false,
     "bme280": false,
     "PCF8574": false

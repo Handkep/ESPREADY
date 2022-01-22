@@ -143,6 +143,13 @@ void HiotDevice::loadConfig(){
         } else {
             logSerial("reading enableLEDs",2);
         }
+        
+        if(doc.containsKey("rgbw")){
+            conf.useRGBW = doc["rgbw"];
+            logSerial("reading rgbw", 4);
+        } else {
+            logSerial("reading rgbw",2);
+        }
 
 
         configFile.close();

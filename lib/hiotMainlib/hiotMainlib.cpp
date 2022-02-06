@@ -11,11 +11,11 @@ PCF8574 PCF(0x20);
 
 
 String topic_debug = "/debug";
-String topic_color = "/cmd/color";
+// String topic_color = "/cmd/color";
 String topic_cmd_json = "/cmd/json";
-String topic_animationspeed = "/cmd/speed" ;
+// String topic_animationspeed = "/cmd/speed" ;
 String topic_fadespeed = "/state/fadespeed";
-String topic_mode = "/cmd/mode";
+// String topic_mode = "/cmd/mode";
 String topic_power = "/cmd/power";
 String topic_irrigation_Zone1 = "/cmd/irrigation/zone1";
 String topic_irrigation_Zone2 = "/cmd/irrigation/zone2";
@@ -25,7 +25,7 @@ String topic_irrigation_Zone5 = "/cmd/irrigation/zone5";
 String topic_irrigation_Zone6 = "/cmd/irrigation/zone6";
 String topic_irrigation_Zone7 = "/cmd/irrigation/zone7";
 String topic_irrigation_Zone8 = "/cmd/irrigation/zone8";
-String topic_reset = "/reset";
+// String topic_reset = "/reset";
 String topic_power_state = "/state/power";
 String topic_state_json = "/state/json";
 String topic_effect_state = "/state/mode";
@@ -77,16 +77,16 @@ void HiotDevice::setup(){
     delay(1000);
     colors.setup();
     loadConfig();
-    topic_color = insertHostnameintoVariable(topic_color);
+    // topic_color = insertHostnameintoVariable(topic_color);
     topic_cmd_json = insertHostnameintoVariable(topic_cmd_json);
-    topic_mode = insertHostnameintoVariable(topic_mode);
-    topic_effect_state = insertHostnameintoVariable(topic_effect_state);
-    topic_power = insertHostnameintoVariable(topic_power);
+    // topic_mode = insertHostnameintoVariable(topic_mode);
+    // topic_effect_state = insertHostnameintoVariable(topic_effect_state);
+    // topic_power = insertHostnameintoVariable(topic_power);
     topic_LWT = insertHostnameintoVariable(topic_LWT);
-    topic_color_state = insertHostnameintoVariable(topic_color_state);
+    // topic_color_state = insertHostnameintoVariable(topic_color_state);
     topic_state_json = insertHostnameintoVariable(topic_state_json);
-    topic_power_state = insertHostnameintoVariable(topic_power_state);
-    topic_STATE = insertHostnameintoVariable(topic_STATE);
+    // topic_power_state = insertHostnameintoVariable(topic_power_state);
+    // topic_STATE = insertHostnameintoVariable(topic_STATE);
     topic_interrupt = insertHostnameintoVariable(topic_interrupt);
     topic_fadespeed = insertHostnameintoVariable(topic_fadespeed);
 
@@ -167,6 +167,10 @@ void HiotDevice::logSerialPretty(String inf, String inf1, String inf2){
 }
 
 // funclogSerial
+// level 0 = debug
+// level 1 = warn
+// level 2 = error
+// level 3 = info
 void HiotDevice::logSerial(String inf, int level){
     switch(level){
         case 0:
@@ -324,7 +328,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             String jsonbuf = doc["state"];
             if(colors.isColorOnOrOff){
                 if(jsonbuf == "OFF"){
-                    backupColor = colors.getColorStringRGB(0);
+                    backupColor = colors.getColorStringRGBW(0);
                     backupEffect = colors.currentEffect;
                     colors.isColorOnOrOff = 0;
                     colors.setColorString("0,0,0");
@@ -369,16 +373,16 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             if(doc["effect"] == "STROBE" || doc["effect"] == "3") colors.currentEffect = 3;
         }
     // not in use \/
-    }else if(recvTopic == topic_color){
-        colors.setColorString(recvPayload);
-        esp.publish(topic_color_state.c_str(),recvPayload.c_str());
-        esp.publish(topic_effect_state.c_str(),"COLOR");
+    // }else if(recvTopic == topic_color){
+    //     colors.setColorString(recvPayload);
+    //     esp.publish(topic_color_state.c_str(),recvPayload.c_str());
+    //     esp.publish(topic_effect_state.c_str(),"COLOR");
 
-    }else if(recvTopic == topic_mode){
-        if(recvPayload == "JUMP") colors.currentEffect = 1;
-        if(recvPayload == "FADE") colors.currentEffect = 2;
-        if(recvPayload == "STROBE") colors.currentEffect = 3;
-        esp.publish(topic_effect_state.c_str(),recvPayload.c_str());
+    // }else if(recvTopic == topic_mode){
+    //     if(recvPayload == "JUMP") colors.currentEffect = 1;
+    //     if(recvPayload == "FADE") colors.currentEffect = 2;
+    //     if(recvPayload == "STROBE") colors.currentEffect = 3;
+    //     esp.publish(topic_effect_state.c_str(),recvPayload.c_str());
 
         // |power|
     }else if(recvTopic == topic_power){
@@ -498,22 +502,22 @@ void HiotDevice::connectToMQTT(){
 
         logSerial(String("(Re)Connectig to MQTT at ")+String(conf.mqttBrokerIp)+ "  "+String(esp.state()),3);
         // logSerial(String(esp.state()),2);
-        if(esp.connect(conf.espHostname, topic_LWT.c_str(),2,true,"offline")){
-        // if(esp.connect(conf.espHostname, conf.mqttBrokerUser , conf.mqttBrokerPassword ,topic_LWT.c_str(),2,true,"offline")){
+        // if(esp.connect(conf.espHostname, topic_LWT.c_str(),2,true,"offline")){
+        if(esp.connect(conf.espHostname, conf.mqttBrokerUser , conf.mqttBrokerPassword ,topic_LWT.c_str(),2,true,"offline")){
             
             logSerial("Connected to MQTT",4);
             alertBlink(10,100,4);
             esp.publish(topic_LWT.c_str(),"online",true);
             if(conf.enableLEDs){
             
-                esp.subscribe(topic_color.c_str());
+                // esp.subscribe(topic_color.c_str());
                 esp.subscribe(topic_cmd_json.c_str());
-                esp.subscribe(topic_mode.c_str());
-                esp.subscribe(topic_power.c_str());
+                // esp.subscribe(topic_mode.c_str());
+                // esp.subscribe(topic_power.c_str());
                 esp.subscribe(topic_interrupt.c_str());
                 esp.publish(topic_fadespeed.c_str(),"45");
                 String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"color\":" + getESPColorJson() + "}";
-                // String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"color\":{ \"r\": 255, \"g\": 255, \"b\":255}";
+                // String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"brightness\": 255, \"color\":{ \"r\": 255, \"g\": 255, \"b\":255}";
                 esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
                 esp.publish(topic_power_state.c_str(),"ON",true);
                 esp.publish(topic_color_state.c_str(),"255,255,255");

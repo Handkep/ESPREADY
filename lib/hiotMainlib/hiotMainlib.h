@@ -1,7 +1,7 @@
 #ifndef HIOTMAINLIB_H
 #define HIOTMAINLIB_H
 
-#define VERSION "1.0.1<"
+#define VERSION "1.0.2"
 
 
 #include <Arduino.h>

@@ -1,8 +1,9 @@
 {
     "hostname0":"Schreibtisch_Unten",
     "hostname4":"Schreibtisch",
-    "hostname":"FensterTreppe",
+    "hostname5":"FensterTreppe",
     "hostname3":"Enclosure",
     "hostname1":"Bewaesserung",
-    "hostname2":"v4"
+    "hostname2":"v4",
+    "hostname":"Patio"
 }

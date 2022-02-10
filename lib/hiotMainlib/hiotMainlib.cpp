@@ -40,7 +40,7 @@ String topic_pull_update = "/pull_update";
 String topic_LWT = "/LWT";
 String topic_STATE = "/STATE";
 
-unsigned long _interval_publishBMETemp = 2000;
+unsigned long _interval_publishBMETemp = 15000;
 
 
 HiotDevice::HiotDevice(){
@@ -358,7 +358,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
                 String colorbuf = String(colordoc["r"]) + "," + String(colordoc["g"]) + "," + String(colordoc["b"]);
                 // String colorbuf = colordoc["r"] + "," + colordoc["g"] + "," + colordoc["b"];
                 colors.setColorString(colorbuf);
-                String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"color\":" + String(doc["color"]) + "}";
+                String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"effect\": \"none\", \"color\":" + String(doc["color"]) + "}";
                 esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
             }
         }
@@ -523,7 +523,7 @@ void HiotDevice::connectToMQTT(){
                 esp.publish(topic_color_state.c_str(),"255,255,255");
             }
             if(conf.usePCF8574){
-
+                logSerial(topic_irrigation_Zone1, DEBUG);
                 esp.subscribe(topic_irrigation_Zone1.c_str());
                 esp.subscribe(topic_irrigation_Zone2.c_str());
                 esp.subscribe(topic_irrigation_Zone3.c_str());
@@ -576,6 +576,7 @@ void HiotDevice::publishBMETemp(){
             logSerial("Could not find a valid BME280 sensor, check wiring!",2);
         }else{
             char buffer[15];
+            String buf = String(sensor.readTemperature()) + " ; " + String(sensor.readHumidity());
             logSerial(String(sensor.readTemperature()),0);
             esp.publish(topic_bme_temperature.c_str(), dtostrf(sensor.readTemperature(),8,2,buffer));
             esp.publish(topic_bme_humidity.c_str(), dtostrf(sensor.readHumidity(),8,2,buffer));

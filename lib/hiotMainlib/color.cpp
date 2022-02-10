@@ -231,7 +231,6 @@ void ColorObj::writeColor(){
         if(millis() - _lastMillis_writeColor_neopixelbus > 25){
             _lastMillis_writeColor_neopixelbus = millis();
             RgbColor red(RGBW_write[0][0], RGBW_write[0][1], RGBW_write[0][2]);
-            // delay(1);
             for(int j = 0; j <= 74;j++){
                 strip.SetPixelColor(j,red);
             }

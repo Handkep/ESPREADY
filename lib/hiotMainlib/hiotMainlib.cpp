@@ -223,7 +223,8 @@ void HiotDevice::logSerial(String name, String color, String inf){
     Serial.println(inf);    
 }
 
-// funcsetLEDPins
+// §setLEDPins
+// set
 void HiotDevice::setLEDPins(int R, int G, int B){
 
     colors.pinAmount = 3;    
@@ -262,6 +263,12 @@ void HiotDevice::setLEDPinsRGBW(int R, int G, int B, int W){
     colors.RGBW_Pin[3] = W;
 
 }
+
+
+
+
+
+
 
 // funcinsertHostnameintoVariable
 String HiotDevice::insertHostnameintoVariable(String topic)

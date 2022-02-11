@@ -185,10 +185,11 @@ String HiotDevice::getESPStateJson(){
     doc["uptimeMillis"] = millis();
     doc["IP"] = WiFi.localIP().toString();
     doc["MAC"] = WiFi.macAddress();
-    doc["color"] = getESPColorJson();
     doc["rssi"] = WiFi.RSSI();
-    WiFi.isHidden
-    serializeJsonPretty(doc, buf);
+    doc["color"]["r"] = colors.RGBW_write[0][0];
+    doc["color"]["g"] = colors.RGBW_write[0][1];
+    doc["color"]["b"] = colors.RGBW_write[0][2];
+    serializeJson(doc, buf);
     // Serial.println(buf);
     return buf;
 }
@@ -198,7 +199,7 @@ String HiotDevice::getESPColorJson(){
     doc["r"] = colors.RGBW_write[0][0];
     doc["g"] = colors.RGBW_write[0][1];
     doc["b"] = colors.RGBW_write[0][2];
-    serializeJsonPretty(doc, buf);
+    serializeJson(doc, buf);
     // Serial.println(buf);
     return buf;
 }

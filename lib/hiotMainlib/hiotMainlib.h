@@ -115,6 +115,7 @@ class HiotDevice{
         void loop();
         void setup();
         void setLEDPins(int R, int G, int B);
+        void setLEDPins(int R, int G, int B, int W);
         void setLEDPinsRGBW(int R, int G, int B, int W);
     private:
         String backupColor;

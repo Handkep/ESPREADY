@@ -577,7 +577,7 @@ void HiotDevice::publishBMETemp(){
         }else{
             char buffer[15];
             String buf = String(sensor.readTemperature()) + " ; " + String(sensor.readHumidity());
-            logSerial(String(sensor.readTemperature()),0);
+            logSerial(buf,0);
             esp.publish(topic_bme_temperature.c_str(), dtostrf(sensor.readTemperature(),8,2,buffer));
             esp.publish(topic_bme_humidity.c_str(), dtostrf(sensor.readHumidity(),8,2,buffer));
             esp.publish(topic_bme_pressure.c_str(), dtostrf(sensor.readPressure(),8,2,buffer));

@@ -16,11 +16,13 @@
 #include <NeoPixelBus.h>
 #include "ESP8266httpUpdate.h"
 
+// used for print colors on the console
 #define ANSI_GREEN "\u001b[32m"
 #define ANSI_YELLOW "\u001b[33m"
 #define ANSI_RED "\u001b[31m"
 #define ANSI_CYAN "\u001b[96m"
 #define ANSI_RST "\u001b[0m"
+// status led pin
 #define ONBORDLED 16
 
 #define DEBUG 0
@@ -35,6 +37,7 @@
 
 // storing config information
 struct Config{
+    // network configuration
     char ssid[50];
     char wifiPassword[50];
     char mqttBrokerIp[50];
@@ -42,6 +45,7 @@ struct Config{
     char mqttBrokerUser[50];
     char mqttBrokerPassword[50];
     char espHostname[50];
+    // device configuration
     bool debug;
     bool useRGBW;
     bool useWS2812;
@@ -55,6 +59,7 @@ extern Config conf;
 class ColorObj
 {
     public:
+        // TODO clear up / combine both pin-setup functions 
         void setRGBPins(int R, int G, int B);
         void setRGBWPins(int R, int G, int B, int W);
         void setup();

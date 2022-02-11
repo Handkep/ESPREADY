@@ -86,7 +86,7 @@ void HiotDevice::setup(){
     // topic_color_state = insertHostnameintoVariable(topic_color_state);
     topic_state_json = insertHostnameintoVariable(topic_state_json);
     // topic_power_state = insertHostnameintoVariable(topic_power_state);
-    // topic_STATE = insertHostnameintoVariable(topic_STATE);
+    topic_STATE = insertHostnameintoVariable(topic_STATE);
     topic_interrupt = insertHostnameintoVariable(topic_interrupt);
     topic_fadespeed = insertHostnameintoVariable(topic_fadespeed);
 
@@ -246,6 +246,23 @@ void HiotDevice::setLEDPins(int R, int G, int B){
 
 }
 
+void HiotDevice::setLEDPins(int R, int G, int B, int W){
+
+    colors.pinAmount = 4;    
+	pinMode(R,OUTPUT);
+	pinMode(G,OUTPUT);
+	pinMode(B,OUTPUT);
+	pinMode(W,OUTPUT);
+    analogWrite(W,255);
+    colors.RGBW[0][3] = 255;
+    colors.RGBW_write[0][3] = 255;
+    colors.RGBW_Pin[0] = R;
+    colors.RGBW_Pin[1] = G;
+    colors.RGBW_Pin[2] = B;
+    colors.RGBW_Pin[3] = W;
+
+}
+
 // funcsetLEDPins
 void HiotDevice::setLEDPinsRGBW(int R, int G, int B, int W){
 
@@ -263,12 +280,6 @@ void HiotDevice::setLEDPinsRGBW(int R, int G, int B, int W){
     colors.RGBW_Pin[3] = W;
 
 }
-
-
-
-
-
-
 
 // funcinsertHostnameintoVariable
 String HiotDevice::insertHostnameintoVariable(String topic)

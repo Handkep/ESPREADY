@@ -186,6 +186,8 @@ String HiotDevice::getESPStateJson(){
     doc["IP"] = WiFi.localIP().toString();
     doc["MAC"] = WiFi.macAddress();
     doc["color"] = getESPColorJson();
+    doc["rssi"] = WiFi.RSSI();
+    WiFi.isHidden
     serializeJsonPretty(doc, buf);
     // Serial.println(buf);
     return buf;

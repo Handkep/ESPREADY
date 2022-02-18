@@ -148,6 +148,7 @@ void ColorObj::fade(){
     }
 }
 
+// loop for effects
 void ColorObj::effect(){
     switch (currentEffect){
         case 1:
@@ -166,7 +167,7 @@ void ColorObj::effect(){
 }
 
 
-
+//calculating time for each increment
 void ColorObj::animateColor(){
     int i = _countAnimateColor;
     int j = ledIndex;
@@ -227,7 +228,7 @@ void ColorObj::animateColor(){
 }
 
 
-
+//write color to pins
 void ColorObj::writeColor(){
     if(conf.useWS2812){
         if(millis() - _lastMillis_writeColor_neopixelbus > 1000/40){

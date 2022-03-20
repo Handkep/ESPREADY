@@ -15,7 +15,7 @@
 #include <ESP8266mDNS.h>
 #include <NeoPixelBus.h>
 #include "ESP8266httpUpdate.h"
-
+#include <logging.h>
 // used for print colors on the console
 #define ANSI_GREEN "\u001b[32m"
 #define ANSI_YELLOW "\u001b[33m"
@@ -131,16 +131,6 @@ class HiotDevice{
         void printVersionSerial();
         //blocking func to blink onbord LED on AMICA NODEMCU
         void alertBlink(int lengthon, int lengthoff, int count);
-        void logSerialPretty(String inf);
-        void logSerialPretty(String inf, String inf1);
-        void logSerialPretty(String inf, String inf1, String inf2);
-        
-        // level 0 = debug
-        // level 1 = warn
-        // level 2 = error
-        // level 3 = info
-        void logSerial(String inf, int level);
-        void logSerial(String name, String color, String inf);
         String insertHostnameintoVariable(String topic);
         // loading config
         void loadConfig();

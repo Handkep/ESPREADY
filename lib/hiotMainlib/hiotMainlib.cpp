@@ -40,7 +40,7 @@ String topic_pull_update = "/pull_update";
 String topic_LWT = "/LWT";
 String topic_STATE = "/STATE";
 
-unsigned long _interval_publishBMETemp = 15000;
+unsigned long _interval_publishBMETemp = 30000;
 
 
 HiotDevice::HiotDevice(){
@@ -76,7 +76,9 @@ void HiotDevice::setup(){
     Serial.println("HH   HH   AAA   NN   NN DDDDD   KK  KK EEEEEEE    IIIII  OOOOO  TTTTTTT \nHH   HH  AAAAA  NNN  NN DD  DD  KK KK  EE          III  OO   OO   TTT \nHHHHHHH AA   AA NN N NN DD   DD KKKK   EEEEE       III  OO   OO   TTT \nHH   HH AAAAAAA NN  NNN DD   DD KK KK  EE          III  OO   OO   TTT \nHH   HH AA   AA NN   NN DDDDDD  KK  KK EEEEEEE    IIIII  OOOO0    TTT ");
     delay(1000);
     colors.setup();
+    logSerial("colors.setup",3);
     loadConfig();
+    logSerial("config",0);
     // topic_color = insertHostnameintoVariable(topic_color);
     topic_cmd_json = insertHostnameintoVariable(topic_cmd_json);
     // topic_mode = insertHostnameintoVariable(topic_mode);
@@ -89,6 +91,7 @@ void HiotDevice::setup(){
     topic_STATE = insertHostnameintoVariable(topic_STATE);
     topic_interrupt = insertHostnameintoVariable(topic_interrupt);
     topic_fadespeed = insertHostnameintoVariable(topic_fadespeed);
+    logSerial("topics",0);
 
     if(conf.useBME280){
         topic_bme_temperature = insertHostnameintoVariable(topic_bme_temperature);

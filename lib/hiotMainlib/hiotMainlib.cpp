@@ -326,10 +326,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
         // |power|
     }else if(recvTopic == topic_power){
 
-
-
     // ESPhttpUpdate.update(espClient, "192.168.2.109", 5000, "/esp");
-
 
     t_httpUpdate_return ret = ESPhttpUpdate.update(espClient, "192.168.2.115", 5000, "/esp", "v1.0.1");
     switch(ret) {
@@ -343,8 +340,6 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             Serial.println("[update] Update ok."); // may not be called since we reboot the ESP
             break;
     }
-
-
 
         if(colors.isColorOnOrOff){
             if(recvPayload == "OFF"){
@@ -473,7 +468,6 @@ void HiotDevice::connectToMQTT(){
                 esp.subscribe(topic_irrigation_Zone8.c_str());
 
             }
-
         }
         // else{
             
@@ -482,8 +476,6 @@ void HiotDevice::connectToMQTT(){
         // }
     }
 }
-
-
 
 // funcpublishESPStateJsonRepetitive
 void HiotDevice::publishESPStateJsonRepetitive(){
@@ -505,7 +497,6 @@ void HiotDevice::publishESPStateJsonRepetitive(){
         }
     }
 }
-
 
 void HiotDevice::publishBMETemp(){
     if(millis() - _millis_publishBMETemp >=  _interval_publishBMETemp)

@@ -2,6 +2,7 @@
 
 // NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(74, 2);
 NeoPixelBus<NeoGrbFeature, NeoWs2812Method> strip(74, 2);
+// NeoPixelBus<NeoGrbFeature, NeoEsp8266Dma800KbpsMethod> strip(74, 2);
 
 
 void ColorObj::setup(){

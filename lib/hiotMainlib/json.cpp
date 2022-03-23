@@ -1,4 +1,5 @@
 #include <hiotMainlib.h>
+#ifndef PRINTJSON
 #define PRINTJSON
 
 void HiotDevice::loadConfig(){
@@ -69,7 +70,7 @@ void HiotDevice::loadConfig(){
         ipFile.close();
         // doc.clear();
     } else {
-        logSerial("Loading ipFile",2);
+        logSerial("Loading ipFile, did you upload the filesystem image to esp8266?",2);
     }
 
     // loading hostname
@@ -93,7 +94,7 @@ void HiotDevice::loadConfig(){
         }
         hostnameFile.close();
     } else {
-        logSerial("Loading hostnameFile",2);
+        logSerial("Loading hostnameFile, did you upload the filesystem image to esp8266?",2);
     }
 
     // loading config
@@ -154,7 +155,21 @@ void HiotDevice::loadConfig(){
 
         configFile.close();
     } else {
-        logSerial("Loading configFile",2);
+        logSerial("Loading configFile, did you upload the filesystem image to esp8266?",2);
+        logSerialPretty("PAUSE");
+        while(true){
+            yield();
+            digitalWrite(ONBORDLED, LOW);
+            delay(1000);
+            digitalWrite(ONBORDLED, HIGH);
+            delay(1000);
+            int networks = WiFi.scanNetworks();//Scan for total networks available
+            for (int i = 0; i < networks; ++i){
+                
+                logSerialPretty(String(WiFi.SSID(i)),String(WiFi.RSSI(i))+" dB",String(WiFi.encryptionType(i) == ENC_TYPE_NONE));
+            }
+                Serial.println("|||||||||||||||||||||||||||||||||||||||||||||");
+        }
     }
 
     // loading effect colors
@@ -205,3 +220,4 @@ String HiotDevice::getESPColorJson(){
 }
 
 
+#endif

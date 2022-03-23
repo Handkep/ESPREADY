@@ -213,6 +213,10 @@ String HiotDevice::insertHostnameintoVariable(String topic)
 // funcconnectToWifi
 void HiotDevice::connectToWifi(){
     if(WiFi.status() != WL_CONNECTED){
+        if(conf.ssid == "" || conf.wifiPassword == ""){
+            logSerial("NO WIFI FOUND IN CONFIG!", ERROR);
+            return;
+        }
         delay(100);
         WiFi.disconnect();
         WiFi.mode(WIFI_STA);

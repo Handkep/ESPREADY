@@ -31,6 +31,8 @@
 #define INFO 3
 #define DONE 4
 
+#define WIFI_TIMEOUT 10000
+
 // bool pin1;
 
 // #define PRINTJSON
@@ -144,6 +146,7 @@ class HiotDevice{
             unsigned long _millis_publishBMETemp = 0;
         
         void connectToWifi();
+            unsigned long _millis_connectToWifi = 0;
         void mqttCallback(char* topic, byte* payld, int length);
         void connectToMQTT();
 

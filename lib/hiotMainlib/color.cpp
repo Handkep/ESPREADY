@@ -1,7 +1,7 @@
 #include <hiotMainlib.h>
 
-// NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(74, 2);
-NeoPixelBus<NeoGrbFeature, NeoWs2812Method> strip(74, 2);
+NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(74, 2);
+// NeoPixelBus<NeoGrbFeature, NeoWs2812Method> strip(74, 2);
 // NeoPixelBus<NeoGrbFeature, NeoEsp8266Dma800KbpsMethod> strip(74, 2);
 
 
@@ -120,13 +120,30 @@ void ColorObj::strobe(){
         _millis_Effect = millis();
         for(int j = 0; j < ledAmmount ; j++ ){
             for (int i = 0; i < pinAmount;i++){
-                RGBW[j][i] = strobecolors[effectIndex][i];
-                fadems[j][i] = 0;
+                // RGBW[j][i] = strobecolors[effectIndex][i];
+                // fadems[j][i] = 10;
+                fadems[j][i] = calculatems(fadespeed*1000,255,0);
             }
         }
+        // RGBW[_StrobeIndex+1][0]=255;
+        // RGBW[_StrobeIndex+1][1]=255;
+        // RGBW[_StrobeIndex+1][2]=255;
+        // RGBW[_StrobeIndex+2][0]=0;
+        // RGBW[_StrobeIndex+2][1]=0;
+        // RGBW[_StrobeIndex+2][2]=0;
+        RGBW[_StrobeIndex][0] = 255-RGBW[_StrobeIndex][0];
+        RGBW[_StrobeIndex][1] = 255-RGBW[_StrobeIndex][1];
+        RGBW[_StrobeIndex][2] = 255-RGBW[_StrobeIndex][2];
+        // RGBW[_StrobeIndex-1][0]=0;
+        // RGBW[_StrobeIndex-1][1]=0;
+        // RGBW[_StrobeIndex-1][2]=0;
         effectIndex++;
         if(effectIndex>=strobelen){
             effectIndex = 0;
+        }
+        _StrobeIndex++;
+        if(_StrobeIndex==ledAmmount){
+            _StrobeIndex = 0;
         }
     }
 }
@@ -171,38 +188,41 @@ void ColorObj::effect(){
 //calculating time for each increment
 void ColorObj::animateColor(){
     int i = _countAnimateColor;
-    int j = ledIndex;
-    unsigned long microsec = micros();
-    if(fadems[j][i] > 0){
+    // int j = ledIndex;
+    for(int j=0;j<ledAmmount;j++){
 
-        if (RGBW_write[j][i] < RGBW[j][i]){
-                    
-            // if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
-            if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+        unsigned long microsec = micros();
+        if(fadems[j][i] > 0){
 
-                // _lastMillis_AnimateColors[j][i] = micros();
-                _lastMillis_AnimateColors[j][i] = microsec;
-                // animate_color_is_not_Blocking = false;
-                RGBW_write[j][i]++;
+            if (RGBW_write[j][i] < RGBW[j][i]){
+                        
+                // if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+                if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+
+                    // _lastMillis_AnimateColors[j][i] = micros();
+                    _lastMillis_AnimateColors[j][i] = microsec;
+                    // animate_color_is_not_Blocking = false;
+                    RGBW_write[j][i]++;
+                }
+            }else if(RGBW_write[j][i] > RGBW[j][i]){
+                
+                // if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+                if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+
+                    // _lastMillis_AnimateColors[j][i] = micros();
+                    _lastMillis_AnimateColors[j][i] = microsec;
+                    // animate_color_is_not_Blocking = false;
+                    RGBW_write[j][i]--;
+                }             
             }
-        }else if(RGBW_write[j][i] > RGBW[j][i]){
+            // else{
+                // RGBW_write[j][i] = RGBW[j][i];
+                //animate_color_is_not_Blocking = true;
+            // }
+        }else if(RGBW_write[j][i] != RGBW[j][i]){
             
-            // if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
-            if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
-
-                // _lastMillis_AnimateColors[j][i] = micros();
-                _lastMillis_AnimateColors[j][i] = microsec;
-                // animate_color_is_not_Blocking = false;
-                RGBW_write[j][i]--;
-            }             
+            RGBW_write[j][i] = RGBW[j][i];
         }
-        // else{
-            // RGBW_write[j][i] = RGBW[j][i];
-            //animate_color_is_not_Blocking = true;
-        // }
-    }else if(RGBW_write[j][i] != RGBW[j][i]){
-        
-        RGBW_write[j][i] = RGBW[j][i];
     }
 
         // if (RGB_write[j][i] < RGB[j][i] && fadems[j][i] > 0){
@@ -231,11 +251,11 @@ void ColorObj::animateColor(){
     if(i > pinAmount){
         i = 0;
 
-        j++;
-        if(j >= ledAmmount){
-            j = 0;
-        }
-        ledIndex = j;
+        // j++;
+        // if(j >= ledAmmount){
+        //     j = 0;
+        // }
+        // ledIndex = j;
     }
     _countAnimateColor = i;
 
@@ -247,8 +267,8 @@ void ColorObj::writeColor(){
     if(conf.useWS2812){
         if(millis() - _lastMillis_writeColor_neopixelbus > 1000/60){
             _lastMillis_writeColor_neopixelbus = millis();
-            RgbColor red(RGBW_write[0][0], RGBW_write[0][1], RGBW_write[0][2]);
-            for(int j = 0; j <= 74;j++){
+            for(int j = 0; j < ledAmmount;j++){
+                RgbColor red(RGBW_write[j][0], RGBW_write[j][1], RGBW_write[j][2]);
                 strip.SetPixelColor(j,red);
             }
             strip.Show();

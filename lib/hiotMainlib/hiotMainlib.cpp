@@ -155,12 +155,15 @@ void HiotDevice::setLEDPins(int R, int G, int B){
     analogWrite(R,255);
     analogWrite(G,255);
     analogWrite(B,255);
-    colors.RGBW[0][0] = 255;
-    colors.RGBW[0][1] = 255;
-    colors.RGBW[0][2] = 255;
-    colors.RGBW_write[0][0] = 255;
-    colors.RGBW_write[0][1] = 255;
-    colors.RGBW_write[0][2] = 255;
+    for(int i = 0; i<LEDAMMOUNT;i++){
+        colors.RGBW[i][0] = 255;
+        colors.RGBW[i][1] = 255;
+        colors.RGBW[i][2] = 255;
+
+        colors.RGBW_write[i][0] = 255;
+        colors.RGBW_write[i][1] = 255;
+        colors.RGBW_write[i][2] = 255;
+    }
     colors.RGBW_Pin[0] = R;
     colors.RGBW_Pin[1] = G;
     colors.RGBW_Pin[2] = B;
@@ -434,6 +437,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             }
         }
     }
+    colors._StrobeIndex = 0;
 }
 
 // funcconnectToMQTT

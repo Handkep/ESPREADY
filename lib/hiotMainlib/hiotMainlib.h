@@ -1,7 +1,7 @@
 #ifndef HIOTMAINLIB_H
 #define HIOTMAINLIB_H
 
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 
 
 #include <Arduino.h>
@@ -71,7 +71,7 @@ class ColorObj
         String getColorStringRGBW(int i);
         void loop();
         int calculatems(int speed, int current_colors, int next_colors);
-        #define LEDAMMOUNT 1
+        #define LEDAMMOUNT 70
         const int ledAmmount = LEDAMMOUNT;
         int RGB_Pin[3];  
         int RGBW_Pin[4];

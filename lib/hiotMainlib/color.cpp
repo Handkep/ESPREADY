@@ -172,26 +172,37 @@ void ColorObj::effect(){
 void ColorObj::animateColor(){
     int i = _countAnimateColor;
     int j = ledIndex;
+    unsigned long microsec = micros();
+    if(fadems[j][i] > 0){
 
-    if (RGBW_write[j][i] < RGBW[j][i] && fadems[j][i] > 0){
-                
-        if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+        if (RGBW_write[j][i] < RGBW[j][i]){
+                    
+            // if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+            if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
 
-            _lastMillis_AnimateColors[j][i] = micros();
-            // animate_color_is_not_Blocking = false;
-            RGBW_write[j][i]++;
+                // _lastMillis_AnimateColors[j][i] = micros();
+                _lastMillis_AnimateColors[j][i] = microsec;
+                // animate_color_is_not_Blocking = false;
+                RGBW_write[j][i]++;
+            }
+        }else if(RGBW_write[j][i] > RGBW[j][i]){
+            
+            // if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+            if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+
+                // _lastMillis_AnimateColors[j][i] = micros();
+                _lastMillis_AnimateColors[j][i] = microsec;
+                // animate_color_is_not_Blocking = false;
+                RGBW_write[j][i]--;
+            }             
         }
-    }else if(RGBW_write[j][i] > RGBW[j][i] && fadems[j][i] > 0){
+        // else{
+            // RGBW_write[j][i] = RGBW[j][i];
+            //animate_color_is_not_Blocking = true;
+        // }
+    }else if(RGBW_write[j][i] != RGBW[j][i]){
         
-        if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
-
-            _lastMillis_AnimateColors[j][i] = micros();
-            // animate_color_is_not_Blocking = false;
-            RGBW_write[j][i]--;
-        }             
-    }else{
         RGBW_write[j][i] = RGBW[j][i];
-        //animate_color_is_not_Blocking = true;
     }
 
         // if (RGB_write[j][i] < RGB[j][i] && fadems[j][i] > 0){
@@ -219,20 +230,22 @@ void ColorObj::animateColor(){
     i ++;
     if(i > pinAmount){
         i = 0;
+
+        j++;
+        if(j >= ledAmmount){
+            j = 0;
+        }
+        ledIndex = j;
     }
     _countAnimateColor = i;
-    j++;
-    if(j >= ledAmmount){
-        j = 0;
-    }
-    ledIndex = j;
+
 }
 
 
 //write color to pins
 void ColorObj::writeColor(){
     if(conf.useWS2812){
-        if(millis() - _lastMillis_writeColor_neopixelbus > 1000/40){
+        if(millis() - _lastMillis_writeColor_neopixelbus > 1000/60){
             _lastMillis_writeColor_neopixelbus = millis();
             RgbColor red(RGBW_write[0][0], RGBW_write[0][1], RGBW_write[0][2]);
             for(int j = 0; j <= 74;j++){

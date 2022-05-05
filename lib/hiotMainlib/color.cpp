@@ -272,6 +272,7 @@ void ColorObj::writeColor(){
                 strip.SetPixelColor(j,red);
             }
             strip.Show();
+            strip.RotateLeft()
             // while(Serial.available() > 0) {  }
             // delayMicroseconds(30 * 75);
         }

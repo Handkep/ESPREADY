@@ -16,6 +16,7 @@
 #include <NeoPixelBus.h>
 #include "ESP8266httpUpdate.h"
 #include <logging.h>
+#include <arrayoperations.h>
 // used for print colors on the console
 #define ANSI_GREEN "\u001b[32m"
 #define ANSI_YELLOW "\u001b[33m"
@@ -91,6 +92,9 @@ class ColorObj
         int ledIndex;
         bool isColorOnOrOff;
             int _StrobeIndex;
+            unsigned char neopixeltest[3] = {0,85,170};
+            bool countdirection[3] = {true,true,true};
+            HsbColor basecolor = HsbColor(0,1,1); 
     private:
         // effects:
 

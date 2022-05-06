@@ -121,28 +121,85 @@ void ColorObj::strobe(){
         for(int j = 0; j < ledAmmount ; j++ ){
             for (int i = 0; i < pinAmount;i++){
                 // RGBW[j][i] = strobecolors[effectIndex][i];
-                // fadems[j][i] = 10;
-                fadems[j][i] = calculatems(fadespeed*1000,255,0);
+                fadems[j][i] = 10000;
+                // fadems[j][i] = calculatems(fadespeed*3000,255,0);
             }
         }
-        // RGBW[_StrobeIndex+1][0]=255;
+
+        // for(int j = 0; j < ledAmmount ; j++ ){
+            // for (int i = 0; i < pinAmount;i++){
+            //     RGBW[0][i] = jumpcolors[effectIndex][i];
+            //     fadems[0][i] = 0;
+            // }
+            // RgbColor rgbcl = RgbColor(RGBW[0][0],RGBW[0][1],RGBW[0][2]);
+            // HsbColor hsbcl =HsbColor(rgbcl);
+            basecolor.H+=0.005;
+            if(basecolor.H>=1){
+                basecolor.H=0;
+            }
+            // Serial.println(basecolor.H);
+            // RgbColor rgbcl = RgbColor(basecolor).;
+            // Serial.println(RgbColor(basecolor).R);
+            // Serial.println(RgbColor(basecolor).G);
+            // Serial.println(RgbColor(basecolor).B);
+            RGBW[0][0] = RgbColor(basecolor).R;
+            RGBW[0][1] = RgbColor(basecolor).G;
+            RGBW[0][2] = RgbColor(basecolor).B;
+        // }
+
+        // for (size_t i = 0; i < 3; i++)
+        // {
+        //     if(neopixeltest[i]==0){
+        //         countdirection[i]= true;
+        //     }else if(neopixeltest[i]==255){
+        //         countdirection[i]= false;
+        //     }
+        // }
+        
+        // RGBW[0][0]=neopixeltest[0];
+        // RGBW[0][1]=neopixeltest[1];
+        // RGBW[0][2]=neopixeltest[2];
+
+        // for (size_t i = 0; i < 3; i++)
+        // {
+        //     if(countdirection[i]==true){
+        //         neopixeltest[i]++;
+        //     }else{
+        //         neopixeltest[i]--;
+
+        //     }
+        // }
+
+        rotatearrleft(RGBW,1,ledAmmount);
+        //   Serial.println();
+        // for (size_t i = 0; i < 1; i++)
+        // {
+        //     for (size_t j = 0; j < 4; j++)
+        //     {
+        //         Serial.print(RGBW[i][j]);
+        //         Serial.print(" ");
+        //     }
+        //     Serial.print(" ");
+        // }
+        // Serial.println();
         // RGBW[_StrobeIndex+1][1]=255;
         // RGBW[_StrobeIndex+1][2]=255;
         // RGBW[_StrobeIndex+2][0]=0;
         // RGBW[_StrobeIndex+2][1]=0;
         // RGBW[_StrobeIndex+2][2]=0;
-        RGBW[_StrobeIndex][0] = 255-RGBW[_StrobeIndex][0];
-        RGBW[_StrobeIndex][1] = 255-RGBW[_StrobeIndex][1];
-        RGBW[_StrobeIndex][2] = 255-RGBW[_StrobeIndex][2];
+        // RGBW[_StrobeIndex][0] = 255-RGBW[_StrobeIndex][0];
+        // RGBW[_StrobeIndex][1] = 255-RGBW[_StrobeIndex][1];
+        // RGBW[_StrobeIndex][2] = 255-RGBW[_StrobeIndex][2];
         // RGBW[_StrobeIndex-1][0]=0;
         // RGBW[_StrobeIndex-1][1]=0;
         // RGBW[_StrobeIndex-1][2]=0;
+
         effectIndex++;
         if(effectIndex>=strobelen){
             effectIndex = 0;
         }
-        _StrobeIndex++;
-        if(_StrobeIndex==ledAmmount){
+        _StrobeIndex +=2;
+        if(_StrobeIndex>255){
             _StrobeIndex = 0;
         }
     }
@@ -272,7 +329,6 @@ void ColorObj::writeColor(){
                 strip.SetPixelColor(j,red);
             }
             strip.Show();
-            strip.RotateLeft()
             // while(Serial.available() > 0) {  }
             // delayMicroseconds(30 * 75);
         }

@@ -12,7 +12,10 @@ void ColorObj::setup(){
     // FastLED.show(); 
     // strip.Begin();
     // strip.Show();
+
     // ICH BIN DDDDDDDDDDDDDD
+    // ICH BIN TEST
+
 }
 void ColorObj::loop(){
     effect();

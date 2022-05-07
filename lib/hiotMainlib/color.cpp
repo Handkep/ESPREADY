@@ -7,8 +7,11 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(74, 2);
 
 void ColorObj::setup(){
 
-    strip.Begin();
-    strip.Show();
+    FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
+    // leds[0] = CRGB::Red; 
+    // FastLED.show(); 
+    // strip.Begin();
+    // strip.Show();
 }
 void ColorObj::loop(){
     effect();
@@ -361,8 +364,10 @@ void ColorObj::writeColor(){
             for(int j = 0; j < ledAmmount;j++){
                 RgbColor red(RGBW_write[j][0], RGBW_write[j][1], RGBW_write[j][2]);
                 strip.SetPixelColor(j,red);
+                leds[j].setRGB(RGBW_write[j][0], RGBW_write[j][1], RGBW_write[j][2]);
             }
-            strip.Show();
+            // strip.Show();
+            FastLED.show(); 
             // while(Serial.available() > 0) {  }
             // delayMicroseconds(30 * 75);
         }

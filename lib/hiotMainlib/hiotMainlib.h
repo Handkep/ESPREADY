@@ -17,6 +17,9 @@
 #include "ESP8266httpUpdate.h"
 #include <logging.h>
 #include <arrayoperations.h>
+#include <fastled.h>
+    #define NUM_LEDS 74
+    #define DATA_PIN 3
 // used for print colors on the console
 #define ANSI_GREEN "\u001b[32m"
 #define ANSI_YELLOW "\u001b[33m"
@@ -74,6 +77,7 @@ class ColorObj
         int calculatems(int speed, int current_colors, int next_colors);
         #define LEDAMMOUNT 74
         const int ledAmmount = LEDAMMOUNT;
+        CRGB leds[NUM_LEDS];
         int RGB_Pin[3];  
         int RGBW_Pin[4];
         int RGB[LEDAMMOUNT][3];

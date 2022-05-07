@@ -99,6 +99,7 @@ class ColorObj
             unsigned char neopixeltest[3] = {0,85,170};
             bool countdirection[3] = {true,true,true};
             HsbColor basecolor = HsbColor(0,1,1); 
+            uint8_t basecolorspectrum;
     private:
         // effects:
 

@@ -133,7 +133,10 @@ void ColorObj::strobe(){
                 // fadems[j][i] = calculatems(fadespeed*3000,255,0);
             }
         }
-
+        CHSV hsv( basecolorspectrum, 255, 255); // pure blue in HSV Spectrum space
+        CRGB rgb;
+        hsv2rgb_rainbow( hsv, rgb);
+        basecolorspectrum+=2;
         // for(int j = 0; j < ledAmmount ; j++ ){
             // for (int i = 0; i < pinAmount;i++){
             //     RGBW[0][i] = jumpcolors[effectIndex][i];
@@ -141,18 +144,18 @@ void ColorObj::strobe(){
             // }
             // RgbColor rgbcl = RgbColor(RGBW[0][0],RGBW[0][1],RGBW[0][2]);
             // HsbColor hsbcl =HsbColor(rgbcl);
-            basecolor.H+=0.005;
-            if(basecolor.H>=1){
-                basecolor.H=0;
-            }
+            // basecolor.H+=0.005;
+            // if(basecolor.H>=1){
+            //     basecolor.H=0;
+            // }
             // Serial.println(basecolor.H);
             // RgbColor rgbcl = RgbColor(basecolor).;
             // Serial.println(RgbColor(basecolor).R);
             // Serial.println(RgbColor(basecolor).G);
             // Serial.println(RgbColor(basecolor).B);
-            RGBW[0][0] = RgbColor(basecolor).R;
-            RGBW[0][1] = RgbColor(basecolor).G;
-            RGBW[0][2] = RgbColor(basecolor).B;
+            RGBW[0][0] = rgb.r;
+            RGBW[0][1] = rgb.g;
+            RGBW[0][2] = rgb.b;
         // }
 
         // for (size_t i = 0; i < 3; i++)

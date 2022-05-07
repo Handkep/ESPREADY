@@ -121,7 +121,8 @@ void ColorObj::strobe(){
         for(int j = 0; j < ledAmmount ; j++ ){
             for (int i = 0; i < pinAmount;i++){
                 // RGBW[j][i] = strobecolors[effectIndex][i];
-                fadems[j][i] = 10000;
+                // fadems[j][i] = 10000;
+                fadems[j][i] = 0;
                 // fadems[j][i] = calculatems(fadespeed*3000,255,0);
             }
         }
@@ -223,6 +224,36 @@ void ColorObj::fade(){
     }
 }
 
+
+void ColorObj::rainbow(){
+
+    if(millis() - _millis_Effect >= fadespeed){
+        _millis_Effect = millis();
+
+
+        basecolor.H+=0.005;
+        if(basecolor.H>=1){
+            basecolor.H=0;
+        }
+
+        for(int j = 0; j < ledAmmount ; j++ ){
+            RGBW[j][0] = RgbColor(basecolor).R;
+            RGBW[j][1] = RgbColor(basecolor).G;
+            RGBW[j][2] = RgbColor(basecolor).B;
+            fadems[j][0] = calculatems(fadespeed*1000, RGBW[j][0], RGBW_write[j][0]);
+            fadems[j][1] = calculatems(fadespeed*1000, RGBW[j][1], RGBW_write[j][1]);
+            fadems[j][2] = calculatems(fadespeed*1000, RGBW[j][2], RGBW_write[j][2]);
+        }
+
+        rotatearrleft(RGBW,1,ledAmmount);
+
+        effectIndex++;
+        if(effectIndex>=jumplen){
+            effectIndex = 0;
+        }
+    }
+}
+
 // loop for effects
 void ColorObj::effect(){
     switch (currentEffect){
@@ -234,6 +265,9 @@ void ColorObj::effect(){
             break;
         case 3:
             strobe();
+            break;
+        case 4:
+            rainbow();
             break;
         
         default:

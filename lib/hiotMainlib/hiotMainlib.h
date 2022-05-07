@@ -101,6 +101,7 @@ class ColorObj
         void jump();
         void strobe();
         void fade();
+        void rainbow();
         void effect();
         unsigned long _millis_Effect;
         int effectIndex;

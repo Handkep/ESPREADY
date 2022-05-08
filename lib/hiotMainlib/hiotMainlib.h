@@ -3,7 +3,10 @@
 
 #define VERSION "1.0.4"
 
-
+#if __cplusplus > 199711L 
+    #define register
+#endif
+#include <Adafruit_I2CDevice.h>
 #include <Arduino.h>
 #include <Arduinojson.h>
 #include <ESP8266WiFi.h>
@@ -17,6 +20,7 @@
 #include "ESP8266httpUpdate.h"
 #include <logging.h>
 #include <arrayoperations.h>
+#define FASTLED_INTERNAL
 #include <fastled.h>
     #define NUM_LEDS 74
     #define DATA_PIN 3
@@ -107,6 +111,7 @@ class ColorObj
         void strobe();
         void fade();
         void rainbow();
+        void effecttest();
         void effect();
         unsigned long _millis_Effect;
         int effectIndex;
@@ -117,7 +122,8 @@ class ColorObj
         int _countWriteColor;
         unsigned long _millis_printcolors;
         unsigned long _lastMillis_AnimateColors[LEDAMMOUNT][4];
-        unsigned long fadems[LEDAMMOUNT][4];
+        // unsigned long fadems[LEDAMMOUNT][4];
+        int fadems[LEDAMMOUNT][4];
 };
         
 

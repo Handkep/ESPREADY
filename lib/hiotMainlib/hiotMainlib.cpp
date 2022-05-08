@@ -75,6 +75,8 @@ void HiotDevice::setup(){
     logSerial("TEST",3);
     Serial.println("HH   HH   AAA   NN   NN DDDDD   KK  KK EEEEEEE    IIIII  OOOOO  TTTTTTT \nHH   HH  AAAAA  NNN  NN DD  DD  KK KK  EE          III  OO   OO   TTT \nHHHHHHH AA   AA NN N NN DD   DD KKKK   EEEEE       III  OO   OO   TTT \nHH   HH AAAAAAA NN  NNN DD   DD KK KK  EE          III  OO   OO   TTT \nHH   HH AA   AA NN   NN DDDDDD  KK  KK EEEEEEE    IIIII  OOOO0    TTT ");
     delay(1000);
+	Serial.println(256/37);
+
     colors.setup();
     logSerial("colors.setup",3);
     loadConfig();
@@ -325,6 +327,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             if(doc["effect"] == "FADE" || doc["effect"] == "2") colors.currentEffect = 2;
             if(doc["effect"] == "STROBE" || doc["effect"] == "3") colors.currentEffect = 3;
             if(doc["effect"] == "RAINBOW" || doc["effect"] == "4") colors.currentEffect = 4;
+            if(doc["effect"] == "EFFECTTEST" || doc["effect"] == "5") colors.currentEffect = 5;
         }
     // not in use \/
     // }else if(recvTopic == topic_color){
@@ -508,6 +511,7 @@ void HiotDevice::publishESPStateJsonRepetitive(){
                 if(colors.currentEffect == 2) effectbuff = "FADE";
                 if(colors.currentEffect == 3) effectbuff = "STROBE";
                 if(colors.currentEffect == 4) effectbuff = "RAINBOW";
+                if(colors.currentEffect == 5) effectbuff = "EFFECTTEST";
                 String colorJsonbuff = "{\"state\": \"ON\", \"effect\":\"" + effectbuff + "\", \"color_mode\": \"rgb\", \"color\":" + getESPColorJson() + "}";
                 esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
             }

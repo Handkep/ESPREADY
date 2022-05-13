@@ -173,6 +173,7 @@ void HiotDevice::setLEDPins(int R, int G, int B){
 void HiotDevice::setLEDPins(int R, int G, int B, int W){
 
     colors.pinAmount = 4;    
+    colors.ledAmmount=1;
 	pinMode(R,OUTPUT);
 	pinMode(G,OUTPUT);
 	pinMode(B,OUTPUT);
@@ -191,6 +192,7 @@ void HiotDevice::setLEDPins(int R, int G, int B, int W){
 void HiotDevice::setLEDPinsRGBW(int R, int G, int B, int W){
 
     colors.pinAmount = 4;    
+    colors.ledAmmount=1;
 	pinMode(R,OUTPUT);
 	pinMode(G,OUTPUT);
 	pinMode(B,OUTPUT);
@@ -311,7 +313,6 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
                 String colorbuf = String(colordoc["r"]) + "," + String(colordoc["g"]) + "," + String(colordoc["b"]);
                 // String colorbuf = colordoc["r"] + "," + colordoc["g"] + "," + colordoc["b"];
                 colors.setColorString(colorbuf);
-                if(conf.useRGBW){colors.convert();}
                 String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"effect\": \"none\", \"color\":" + String(doc["color"]) + "}";
                 esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
             }

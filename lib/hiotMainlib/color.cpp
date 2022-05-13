@@ -24,10 +24,12 @@ void ColorObj::setRGBPins(int R, int G, int B){
 // funcconvert
 bool ColorObj::convert()
 {
-    for(int i = 0; i < ledAmmount ; i++ ){
+    // for(int i = 0; i < ledAmmount ; i++ ){
+        int i = 0;
         RGB[i][0] = RGBW[i][0];
         RGB[i][1] = RGBW[i][1];
         RGB[i][2] = RGBW[i][2];
+
         if((RGB[i][0] <= RGB[i][1]) && (RGB[i][0] <= RGB[i][2])){
             RGBW[i][0] = RGB[i][0] - RGB[i][0];
             RGBW[i][1] = RGB[i][1] - RGB[i][0];
@@ -48,7 +50,7 @@ bool ColorObj::convert()
             RGBW[i][3] = RGB[i][2];
 
         }
-    }
+    // }
     return 0;
 }
 
@@ -376,19 +378,19 @@ void ColorObj::writeColor(){
     }
     // if(millis() - _millis_printcolors >= 1*100){
     //     _millis_printcolors = millis();
-    //     for(int i=0;i<3;i++)
-    //     {
-    //         Serial.print(RGB_write[0][i]);
-    //         Serial.print("\t");
-    //     }
-    //     Serial.print("\t");
-    //     Serial.print("\t");
-    //     Serial.print("\t");
-    //     for(int i=0;i<pinAmount;i++)
-    //     {
-    //         Serial.print(RGBW_write[0][i]);
-    //         Serial.print("\t");
-    //     }
-    //     Serial.println();
+        // for(int i=0;i<3;i++)
+        // {
+        //     Serial.print(RGB_write[0][i]);
+        //     Serial.print("\t");
+        // }
+        // Serial.print("\t");
+        // Serial.print("\t");
+        // Serial.print("\t");
+        // for(int i=0;i<pinAmount;i++)
+        // {
+        //     Serial.print(RGBW_write[0][i]);
+        //     Serial.print("\t");
+        // }
+        // Serial.println();
     // }
 }

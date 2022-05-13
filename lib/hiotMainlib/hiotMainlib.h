@@ -1,7 +1,7 @@
 #ifndef HIOTMAINLIB_H
 #define HIOTMAINLIB_H
 
-#define VERSION "1.0.4"
+#define VERSION "1.0.5_beta"
 
 #if __cplusplus > 199711L 
     #define register

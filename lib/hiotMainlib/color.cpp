@@ -325,26 +325,26 @@ void ColorObj::animateColor(){
     // int j = ledIndex;
     for(int j=0;j<ledAmmount;j++){
 
-        unsigned long microsec = micros();
+        // unsigned long microsec = micros();
         if(fadems[j][i] > 0){
 
             if (RGBW_write[j][i] < RGBW[j][i]){
                         
-                // if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
-                if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+                if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+                // if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
 
-                    // _lastMillis_AnimateColors[j][i] = micros();
-                    _lastMillis_AnimateColors[j][i] = microsec;
+                    _lastMillis_AnimateColors[j][i] = micros();
+                    // _lastMillis_AnimateColors[j][i] = microsec;
                     // animate_color_is_not_Blocking = false;
                     RGBW_write[j][i]++;
                 }
             }else if(RGBW_write[j][i] > RGBW[j][i]){
                 
-                // if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
-                if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+                if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+                // if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
 
-                    // _lastMillis_AnimateColors[j][i] = micros();
-                    _lastMillis_AnimateColors[j][i] = microsec;
+                    _lastMillis_AnimateColors[j][i] = micros();
+                    // _lastMillis_AnimateColors[j][i] = microsec;
                     // animate_color_is_not_Blocking = false;
                     RGBW_write[j][i]--;
                 }             

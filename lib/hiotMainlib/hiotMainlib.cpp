@@ -121,6 +121,13 @@ void HiotDevice::setup(){
         // }
         logSerial("Tested Relays",0);
     }
+    Serial.print("ASDF");
+    delay(1000);
+    Serial.print("ASDF\r");
+    delay(1000);
+    Serial.print("JKLÖ\r");
+    delay(1000);
+    
     connectToWifi();
     connectToMQTT();
     esp.publish(topic_STATE.c_str(),getESPStateJson().c_str());

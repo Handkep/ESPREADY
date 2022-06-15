@@ -73,8 +73,12 @@ void HiotDevice::setup(){
     logSerial("TEST",1);
     logSerial("TEST",2);
     logSerial("TEST",3);
+    // delay(1000);
+    Serial.write(27);       // ESC command
+    Serial.print("[2J");    // clear screen command
+    Serial.write(27);
+    Serial.print("[H");
     Serial.println("HH   HH   AAA   NN   NN DDDDD   KK  KK EEEEEEE    IIIII  OOOOO  TTTTTTT \nHH   HH  AAAAA  NNN  NN DD  DD  KK KK  EE          III  OO   OO   TTT \nHHHHHHH AA   AA NN N NN DD   DD KKKK   EEEEE       III  OO   OO   TTT \nHH   HH AAAAAAA NN  NNN DD   DD KK KK  EE          III  OO   OO   TTT \nHH   HH AA   AA NN   NN DDDDDD  KK  KK EEEEEEE    IIIII  OOOO0    TTT ");
-    delay(1000);
     colors.setup();
     logSerial("colors.setup",3);
     loadConfig();
@@ -121,12 +125,7 @@ void HiotDevice::setup(){
         // }
         logSerial("Tested Relays",0);
     }
-    Serial.print("ASDF");
-    delay(1000);
-    Serial.print("ASDF\r");
-    delay(1000);
-    Serial.print("JKLÖ\r");
-    delay(1000);
+
     
     connectToWifi();
     connectToMQTT();
@@ -241,13 +240,17 @@ void HiotDevice::connectToWifi(){
             Serial.print(".");
             alertBlink(5, 500,1);
             if(millis() - _millis_connectToWifi >= WIFI_TIMEOUT){
-                Serial.println();
-                logSerial("no Wifi found, try again in 20s",ERROR);
+                // Serial.print("\r");
+                Serial.print("\r                                                    \r");
+                // Serial.print("\r");
+                logSerial("no Wifi found, try again in 20s\r",ERROR,false);
                 delay(20000);
+                Serial.print("\r                                                    \r");
                 _millis_connectToWifi = millis();
             }
         }
         // Serial.println();
+        Serial.print("\r                                                    \r");
         logSerial(String("Connected to Wifi at ")+String(conf.ssid),4);
         logSerialPretty("Wifi-Info",String("IP: ") + String(WiFi.localIP().toString()) + String("\n") + 
                         String("Hostname: ") + WiFi.hostname() + String("\n") + 

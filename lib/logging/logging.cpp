@@ -63,7 +63,44 @@ void logSerial(String inf, int level){
             break;
     }
 }
-
+//bool returndir: true -> \r is on the end
+//bool returndir: false -> \r is on the beginning
+void logSerial(String inf, int level, bool returndir){
+    switch(level){
+        case 0:
+            Serial.print(ANSI_GREEN);
+            Serial.print("[DEBUG]");
+            Serial.print(ANSI_RST);
+            Serial.print("\t");
+            break;
+        case 1:
+            Serial.print(ANSI_YELLOW);
+            Serial.print("[WARN]");
+            Serial.print(ANSI_RST);
+            Serial.print("\t");
+            break;
+        case 2:
+            Serial.print(ANSI_RED);
+            Serial.print("[ERROR]"); //
+            Serial.print(ANSI_RST);
+            Serial.print("\t");
+            break;
+        case 3:
+            Serial.print(ANSI_CYAN);
+            Serial.print("[INFO]"); //
+            Serial.print(ANSI_RST);
+            Serial.print("\t");
+            break;
+        case 4:
+            Serial.print(ANSI_GREEN);
+            Serial.print("[DONE]"); //
+            Serial.print(ANSI_RST);
+            Serial.print("\t");
+            break;
+    }
+    Serial.print(inf);
+    Serial.print("\r");
+}
 void logSerial(String name, String color, String inf){
 
     Serial.print(color);

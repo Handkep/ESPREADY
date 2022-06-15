@@ -156,7 +156,7 @@ void HiotDevice::loadConfig(){
         configFile.close();
     } else {
         logSerial("Loading configFile, did you upload the filesystem image to esp8266?",2);
-        logSerialPretty("PAUSE");
+        logSerialPretty("NOW SCANNING FOR NETWORKS");
         while(true){
             yield();
             digitalWrite(ONBORDLED, LOW);
@@ -164,11 +164,17 @@ void HiotDevice::loadConfig(){
             digitalWrite(ONBORDLED, HIGH);
             delay(1000);
             int networks = WiFi.scanNetworks();//Scan for total networks available
+            
+            Serial.write(27);       // ESC command
+            Serial.print("[2J");    // clear screen command
+            Serial.write(27);
+            Serial.print("[H");
+            Serial.println("RSSI\tCHANNEL\tSSID"); 
             for (int i = 0; i < networks; ++i){
                 
-                logSerialPretty(String(WiFi.SSID(i)),String(WiFi.RSSI(i))+" dB",String(WiFi.encryptionType(i) == ENC_TYPE_NONE));
+                // logSerialPretty(String(WiFi.SSID(i)),String(WiFi.RSSI(i))+" dB",String(WiFi.encryptionType(i) == ENC_TYPE_NONE));
+                Serial.println(String(WiFi.RSSI(i))+ "\t"+ String(WiFi.channel(i)) +"\t"+ String(WiFi.SSID(i))); 
             }
-                Serial.println("|||||||||||||||||||||||||||||||||||||||||||||");
         }
     }
 

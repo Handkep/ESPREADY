@@ -324,6 +324,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
                 // String colorbuf = colordoc["r"] + "," + colordoc["g"] + "," + colordoc["b"];
                 colors.setColorString(colorbuf);
                 String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"effect\": \"none\", \"color\":" + String(doc["color"]) + "}";
+                
                 esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
             }
         }

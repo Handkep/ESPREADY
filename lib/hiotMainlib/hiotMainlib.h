@@ -1,9 +1,15 @@
 #ifndef HIOTMAINLIB_H
 #define HIOTMAINLIB_H
 
-#define VERSION "1.0.4B1305"
+
+#define VERSION "1.0.5_beta"
 
 
+
+#if __cplusplus > 199711L 
+    #define register
+#endif
+#include <Adafruit_I2CDevice.h>
 #include <Arduino.h>
 #include <Arduinojson.h>
 #include <ESP8266WiFi.h>
@@ -17,6 +23,10 @@
 #include "ESP8266httpUpdate.h"
 #include <logging.h>
 #include <arrayoperations.h>
+#define FASTLED_INTERNAL
+#include <fastled.h>
+    #define NUM_LEDS 74
+    #define DATA_PIN 3
 // used for print colors on the console
 #define ANSI_GREEN "\u001b[32m"
 #define ANSI_YELLOW "\u001b[33m"
@@ -73,7 +83,10 @@ class ColorObj
         void loop();
         int calculatems(int speed, int current_colors, int next_colors);
         #define LEDAMMOUNT 74
-        int ledAmmount = LEDAMMOUNT;
+
+        const int ledAmmount = LEDAMMOUNT;
+        CRGB leds[NUM_LEDS];
+
         int RGB_Pin[3];  
         int RGBW_Pin[4];
         int RGB[LEDAMMOUNT][3];
@@ -95,6 +108,7 @@ class ColorObj
             unsigned char neopixeltest[3] = {0,85,170};
             bool countdirection[3] = {true,true,true};
             HsbColor basecolor = HsbColor(0,1,1); 
+            uint8_t basecolorspectrum;
     private:
         // effects:
 
@@ -102,6 +116,7 @@ class ColorObj
         void strobe();
         void fade();
         void rainbow();
+        void effecttest();
         void effect();
         unsigned long _millis_Effect;
         int effectIndex;
@@ -112,7 +127,8 @@ class ColorObj
         int _countWriteColor;
         unsigned long _millis_printcolors;
         unsigned long _lastMillis_AnimateColors[LEDAMMOUNT][4];
-        unsigned long fadems[LEDAMMOUNT][4];
+        // unsigned long fadems[LEDAMMOUNT][4];
+        int fadems[LEDAMMOUNT][4];
 };
         
 

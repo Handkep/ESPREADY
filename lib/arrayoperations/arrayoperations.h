@@ -7,4 +7,6 @@ void reversearr(int (*arr)[LENGTHOF2NDARRAY], size_t len);
 
 void rotatearrleft(int (*arr)[LENGTHOF2NDARRAY], size_t n, size_t len);
 void rotatearrright(int (*arr)[LENGTHOF2NDARRAY], size_t n, size_t len);
+
+
 #endif

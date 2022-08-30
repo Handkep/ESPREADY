@@ -1,6 +1,6 @@
 #include <hiotMainlib.h>
 
-NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(74, 2);
+// NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(74, 2);
 // NeoPixelBus<NeoGrbFeature, NeoWs2812Method> strip(74, 2);
 // NeoPixelBus<NeoGrbFeature, NeoEsp8266Dma800KbpsMethod> strip(74, 2);
 // asdf
@@ -8,8 +8,15 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(74, 2);
 
 void ColorObj::setup(){
 
-    strip.Begin();
-    strip.Show();
+    FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
+    // leds[0] = CRGB::Red; 
+    // FastLED.show(); 
+    // strip.Begin();
+    // strip.Show();
+
+    // ICH BIN DDDDDDDDDDDDDD
+    // ICH BIN TEST
+
 }
 void ColorObj::loop(){
     effect();
@@ -125,11 +132,14 @@ void ColorObj::strobe(){
             for (int i = 0; i < pinAmount;i++){
                 // RGBW[j][i] = strobecolors[effectIndex][i];
                 // fadems[j][i] = 10000;
-                fadems[j][i] = 0;
+                // fadems[j][i] = 0;
                 // fadems[j][i] = calculatems(fadespeed*3000,255,0);
             }
         }
-
+        CHSV hsv( basecolorspectrum, 255, 255); // pure blue in HSV Spectrum space
+        CRGB rgb;
+        hsv2rgb_spectrum( hsv, rgb);
+        basecolorspectrum+=5;
         // for(int j = 0; j < ledAmmount ; j++ ){
             // for (int i = 0; i < pinAmount;i++){
             //     RGBW[0][i] = jumpcolors[effectIndex][i];
@@ -137,18 +147,23 @@ void ColorObj::strobe(){
             // }
             // RgbColor rgbcl = RgbColor(RGBW[0][0],RGBW[0][1],RGBW[0][2]);
             // HsbColor hsbcl =HsbColor(rgbcl);
-            basecolor.H+=0.005;
-            if(basecolor.H>=1){
-                basecolor.H=0;
-            }
+            // basecolor.H+=0.005;
+            // if(basecolor.H>=1){
+            //     basecolor.H=0;
+            // }
             // Serial.println(basecolor.H);
             // RgbColor rgbcl = RgbColor(basecolor).;
             // Serial.println(RgbColor(basecolor).R);
             // Serial.println(RgbColor(basecolor).G);
             // Serial.println(RgbColor(basecolor).B);
-            RGBW[0][0] = RgbColor(basecolor).R;
-            RGBW[0][1] = RgbColor(basecolor).G;
-            RGBW[0][2] = RgbColor(basecolor).B;
+        RGBW[0][0] = rgb.r;
+        RGBW[0][1] = rgb.g;
+        RGBW[0][2] = rgb.b;
+        for(int i = 0; i < pinAmount ; i++ ){
+            fadems[0][i] = calculatems(fadespeed*10000,RGBW[0][i],RGBW[1][i]);
+        }
+        rotatearrleft(fadems,1,ledAmmount);
+        rotatearrleft(RGBW,1,ledAmmount);
         // }
 
         // for (size_t i = 0; i < 3; i++)
@@ -174,7 +189,6 @@ void ColorObj::strobe(){
         //     }
         // }
 
-        rotatearrleft(RGBW,1,ledAmmount);
         //   Serial.println();
         // for (size_t i = 0; i < 1; i++)
         // {
@@ -257,6 +271,32 @@ void ColorObj::rainbow(){
     }
 }
 
+
+void ColorObj::effecttest(){
+    if(millis() - _millis_Effect >= fadespeed){
+        _millis_Effect = millis();
+        for(size_t i=0;i<ledAmmount;i++){
+            RGBW[i][0] = 0;
+            RGBW[i][1] = 0;
+            RGBW[i][2] = 0;
+
+        }
+        RGBW[37][0] = 255;
+        for(size_t i=0;i<70;i++){
+            RGBW[i][0] = lerp8by8(255,0,i*(256/70));
+            // Serial.print(RGBW[i][0]);
+            // Serial.print(" ");
+            // Serial.println(i*(256/70));
+        }
+
+        effectIndex++;
+        if(effectIndex>=jumplen){
+            effectIndex = 0;
+        }
+    }
+}
+
+
 // loop for effects
 void ColorObj::effect(){
     switch (currentEffect){
@@ -272,6 +312,9 @@ void ColorObj::effect(){
         case 4:
             rainbow();
             break;
+        case 5:
+            effecttest();
+            break;
         
         default:
             break;
@@ -285,27 +328,21 @@ void ColorObj::animateColor(){
     // int j = ledIndex;
     for(int j=0;j<ledAmmount;j++){
 
-        unsigned long microsec = micros();
+        // unsigned long microsec = micros();
         if(fadems[j][i] > 0){
 
             if (RGBW_write[j][i] < RGBW[j][i]){
                         
-                // if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
-                if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+                if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
 
-                    // _lastMillis_AnimateColors[j][i] = micros();
-                    _lastMillis_AnimateColors[j][i] = microsec;
-                    // animate_color_is_not_Blocking = false;
+                    _lastMillis_AnimateColors[j][i] = micros();
                     RGBW_write[j][i]++;
                 }
             }else if(RGBW_write[j][i] > RGBW[j][i]){
                 
-                // if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
-                if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
+                if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
 
-                    // _lastMillis_AnimateColors[j][i] = micros();
-                    _lastMillis_AnimateColors[j][i] = microsec;
-                    // animate_color_is_not_Blocking = false;
+                    _lastMillis_AnimateColors[j][i] = micros();
                     RGBW_write[j][i]--;
                 }             
             }
@@ -363,9 +400,11 @@ void ColorObj::writeColor(){
             _lastMillis_writeColor_neopixelbus = millis();
             for(int j = 0; j < ledAmmount;j++){
                 RgbColor red(RGBW_write[j][0], RGBW_write[j][1], RGBW_write[j][2]);
-                strip.SetPixelColor(j,red);
+                // strip.SetPixelColor(j,red);
+                leds[j].setRGB(RGBW_write[j][0], RGBW_write[j][1], RGBW_write[j][2]);
             }
-            strip.Show();
+            // strip.Show();
+            FastLED.show(); 
             // while(Serial.available() > 0) {  }
             // delayMicroseconds(30 * 75);
         }

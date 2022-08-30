@@ -338,6 +338,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             if(doc["effect"] == "FADE" || doc["effect"] == "2") colors.currentEffect = 2;
             if(doc["effect"] == "STROBE" || doc["effect"] == "3") colors.currentEffect = 3;
             if(doc["effect"] == "RAINBOW" || doc["effect"] == "4") colors.currentEffect = 4;
+            if(doc["effect"] == "EFFECTTEST" || doc["effect"] == "5") colors.currentEffect = 5;
         }
     // not in use \/
     // }else if(recvTopic == topic_color){
@@ -521,6 +522,7 @@ void HiotDevice::publishESPStateJsonRepetitive(){
                 if(colors.currentEffect == 2) effectbuff = "FADE";
                 if(colors.currentEffect == 3) effectbuff = "STROBE";
                 if(colors.currentEffect == 4) effectbuff = "RAINBOW";
+                if(colors.currentEffect == 5) effectbuff = "EFFECTTEST";
                 String colorJsonbuff = "{\"state\": \"ON\", \"effect\":\"" + effectbuff + "\", \"color_mode\": \"rgb\", \"color\":" + getESPColorJson() + "}";
                 esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
             }

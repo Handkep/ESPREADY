@@ -26,9 +26,9 @@ void rotatearrleft(int (*arr)[LENGTHOF2NDARRAY], size_t n, size_t len)
     reversearr(arr + n, len - n);
     reversearr(arr, len);
 }
-void rotatearrright(int (*arr)[LENGTHOF2NDARRAY], size_t n, size_t len)
-{
-    reversearr(arr, len);
-    reversearr(arr + n, len - n);
-    reversearr(arr, n);
+
+void rotatearrright(int (*arr)[LENGTHOF2NDARRAY], size_t n, size_t len){
+  reversearr(arr, len);
+  reversearr(arr + n, len - n);
+  reversearr(arr, n);
 }

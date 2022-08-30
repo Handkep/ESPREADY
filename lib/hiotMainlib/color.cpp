@@ -1,6 +1,6 @@
 #include <hiotMainlib.h>
 
-NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(74, 2);
+// NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(74, 2);
 // NeoPixelBus<NeoGrbFeature, NeoWs2812Method> strip(74, 2);
 // NeoPixelBus<NeoGrbFeature, NeoEsp8266Dma800KbpsMethod> strip(74, 2);
 
@@ -331,21 +331,15 @@ void ColorObj::animateColor(){
             if (RGBW_write[j][i] < RGBW[j][i]){
                         
                 if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
-                // if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
 
                     _lastMillis_AnimateColors[j][i] = micros();
-                    // _lastMillis_AnimateColors[j][i] = microsec;
-                    // animate_color_is_not_Blocking = false;
                     RGBW_write[j][i]++;
                 }
             }else if(RGBW_write[j][i] > RGBW[j][i]){
                 
                 if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
-                // if (microsec - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
 
                     _lastMillis_AnimateColors[j][i] = micros();
-                    // _lastMillis_AnimateColors[j][i] = microsec;
-                    // animate_color_is_not_Blocking = false;
                     RGBW_write[j][i]--;
                 }             
             }
@@ -403,7 +397,7 @@ void ColorObj::writeColor(){
             _lastMillis_writeColor_neopixelbus = millis();
             for(int j = 0; j < ledAmmount;j++){
                 RgbColor red(RGBW_write[j][0], RGBW_write[j][1], RGBW_write[j][2]);
-                strip.SetPixelColor(j,red);
+                // strip.SetPixelColor(j,red);
                 leds[j].setRGB(RGBW_write[j][0], RGBW_write[j][1], RGBW_write[j][2]);
             }
             // strip.Show();

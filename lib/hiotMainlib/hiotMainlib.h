@@ -1,7 +1,10 @@
 #ifndef HIOTMAINLIB_H
 #define HIOTMAINLIB_H
 
+
 #define VERSION "1.0.5_beta"
+
+
 
 #if __cplusplus > 199711L 
     #define register
@@ -80,8 +83,10 @@ class ColorObj
         void loop();
         int calculatems(int speed, int current_colors, int next_colors);
         #define LEDAMMOUNT 74
+
         const int ledAmmount = LEDAMMOUNT;
         CRGB leds[NUM_LEDS];
+
         int RGB_Pin[3];  
         int RGBW_Pin[4];
         int RGB[LEDAMMOUNT][3];

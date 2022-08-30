@@ -13,5 +13,6 @@ void logSerialPretty(String inf);
 void logSerialPretty(String inf, String inf1);
 void logSerialPretty(String inf, String inf1, String inf2);
 void logSerial(String inf, int level);
+void logSerial(String inf, int level, bool returndir);
 void logSerial(String name, String color, String inf);
 #endif

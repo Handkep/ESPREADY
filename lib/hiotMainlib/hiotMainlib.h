@@ -72,7 +72,7 @@ extern Config conf;
 class ColorObj
 {
     public:
-        // TODO clear up / combine both pin-setup functions 
+        // TODO clear up / combine both pin-setup functions  
         void setRGBPins(int R, int G, int B);
         void setRGBWPins(int R, int G, int B, int W);
         void setup();
@@ -81,7 +81,7 @@ class ColorObj
         String getColorStringRGB(int i);
         String getColorStringRGBW(int i);
         void adjustBrightnessColor();
-        int currentBrightness;
+        uint8_t currentBrightness;
         void loop();
         int calculatems(int speed, int current_colors, int next_colors);
         #define LEDAMMOUNT 74
@@ -97,7 +97,7 @@ class ColorObj
         uint8_t RGB_write[LEDAMMOUNT][3];
         uint8_t RGBW_write[LEDAMMOUNT][4];
         unsigned long fade_micros[4];
-        unsigned long fade_millis; //could be deleted
+        unsigned long fade_millis; // could be deleted
         int pinAmount;
         uint8_t jumpcolors[3][4] = {{255,0,0,0},{0,255,0,0},{0,0,255,0}};
         uint8_t strobecolors[2][4] = {{255, 255, 255, 255}, {0, 0, 0}};
@@ -125,7 +125,7 @@ class ColorObj
         int effectIndex;
         void animateColor();
         void writeColor();
-        // unsigned long _lastMillis_adjustbrightness;
+        unsigned long _lastMillis_adjustbrightness;
         unsigned long _lastMillis_writeColor_neopixelbus;
         int _countAnimateColor;
         int _countWriteColor;

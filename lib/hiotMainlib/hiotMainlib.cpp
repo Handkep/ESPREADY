@@ -326,8 +326,8 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             if(colordoc.containsKey("r") && colordoc.containsKey("g") && colordoc.containsKey("b")){
                 // String colorBuffer = String(colordoc["r"]) + "," + String(colordoc["g"]) + "," + String(colordoc["b"]); 36296 36312
 
-                char colorBuffer[15]; 
-                sprintf(colorBuffer, "%d,%d,%d", colordoc["r"].as<int>(), colordoc["g"].as<int>(), colordoc["b"].as<int>());
+                char colorBuffer[15];
+                sprintf(colorBuffer, "%d,%d,%d", colordoc["r"].as<uint8_t>(), colordoc["g"].as<uint8_t>(), colordoc["b"].as<uint8_t>());
 
                 logSerial(colorBuffer, 2);
                 colors.setColorString(String(colorBuffer));
@@ -338,18 +338,11 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
         }
         if (doc.containsKey(F("brightness")))
         {
-            // Serial.println(String(doc["brightness"]).toInt());
-            // colors.currentBrightness = String(doc["brightness"]).toInt();
-            // String colorJsonbuff = "{\"state\": \"ON\",  \"brightness\": " + String(doc["brightness"]) + "}";
-            // esp.publish(topic_state_json.c_str(), colorJsonbuff.c_str());
-            // if (brightnessdoc.containsKey("r") && brightnessdoc.containsKey("g") && brightnessdoc.containsKey("b"))
-            // {
-            //     String brightnessbuf = String(brightnessdoc["r"]) + "," + String(brightnessdoc["g"]) + "," + String(brightnessdoc["b"]);
-            //     // String colorbuf = colordoc["r"] + "," + colordoc["g"] + "," + colordoc["b"];
-            //     colors.setColorString(brightnessbuf);
-            //     String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"effect\": \"none\", \"color\":" + String(doc["color"]) + "}";
-
-            // }
+            colors.currentBrightness = doc["brightness"].as<uint8_t>();
+            char brightnessBuffer[40];
+            sprintf(brightnessBuffer, "{\"state\": \"ON\",  \"brightness\":%d}", colors.currentBrightness);
+            esp.publish(topic_state_json.c_str(), brightnessBuffer);
+            logSerial(String(brightnessBuffer), 2);
         }
         if(doc.containsKey(F("fadespeed"))){
             colors.fadespeed = doc["fadespeed"];
@@ -357,23 +350,12 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             colors.fadespeed = pow(colors.fadespeed,3)/50;
         }
         if(doc.containsKey(F("effect"))){
-            if(doc["effect"] == "JUMP" || doc["effect"] == "1") colors.currentEffect = 1;
-            if(doc["effect"] == "FADE" || doc["effect"] == "2") colors.currentEffect = 2;
-            if(doc["effect"] == "STROBE" || doc["effect"] == "3") colors.currentEffect = 3;
-            if(doc["effect"] == "RAINBOW" || doc["effect"] == "4") colors.currentEffect = 4;
-            if(doc["effect"] == "EFFECTTEST" || doc["effect"] == "5") colors.currentEffect = 5;
+            if(doc[F("effect")] == F("JUMP") || doc[F("effect")] == F("1")) colors.currentEffect = 1;
+            if(doc[F("effect")] == F("FADE") || doc[F("effect")] == F("2")) colors.currentEffect = 2;
+            if(doc[F("effect")] == F("STROBE") || doc[F("effect")] == F("3")) colors.currentEffect = 3;
+            if(doc[F("effect")] == F("RAINBOW") || doc[F("effect")] == F("4")) colors.currentEffect = 4;
+            if(doc[F("effect")] == F("EFFECTTEST") || doc[F("effect")] == F("5")) colors.currentEffect = 5;
         }
-    // not in use \/
-    // }else if(recvTopic == topic_color){
-    //     colors.setColorString(recvPayload);
-    //     esp.publish(topic_color_state.c_str(),recvPayload.c_str());
-    //     esp.publish(topic_effect_state.c_str(),"COLOR");
-
-    // }else if(recvTopic == topic_mode){
-    //     if(recvPayload == "JUMP") colors.currentEffect = 1;
-    //     if(recvPayload == "FADE") colors.currentEffect = 2;
-    //     if(recvPayload == "STROBE") colors.currentEffect = 3;
-    //     esp.publish(topic_effect_state.c_str(),recvPayload.c_str());
 
         // |power|
     }else if(recvTopic == topic_power){

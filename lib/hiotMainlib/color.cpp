@@ -319,20 +319,24 @@ void ColorObj::effect(){
 void ColorObj::adjustBrightnessColor()
 {
 
-    // if (millis() - _lastMillis_adjustbrightness > 1000)
-    // {
-    //     _lastMillis_adjustbrightness = millis();
-        // for (int i = 0; i < ledAmmount; i++)
-        // {
-        //     for (int j = 0; j < pinAmount; j++)
-        //     {
-        //         RGBWBrightnessAdjusted[i][j] = RGBW[i][j];
+    if (millis() - _lastMillis_adjustbrightness > 100)
+    {
+        _lastMillis_adjustbrightness = millis();
+        for (int i = 0; i < ledAmmount; i++)
+        {
+            // int i = 0;
+                // Serial.println("adf");
+            for (int j = 0; j < pinAmount; j++)
+            {
+                RGBWBrightnessAdjusted[i][j] = RGBW[i][j];
 
-        //         float buf = RGBWBrightnessAdjusted[i][j] / 255;
-        //         Serial.println(buf);
-        //     }
-        // }
-    // }
+                float buf = (float)RGBWBrightnessAdjusted[i][j] / 255;
+                buf *= currentBrightness;
+                RGBWBrightnessAdjusted[i][j] = (uint8_t)roundf(buf);
+                // Serial.println(RGBWBrightnessAdjusted[i][j]);
+            }
+        }
+    }
 }
 //calculating time for each increment
 void ColorObj::animateColor(){
@@ -343,28 +347,33 @@ void ColorObj::animateColor(){
         // unsigned long microsec = micros();
         if(fadems[j][i] > 0){
 
-            if (RGBW_write[j][i] < RGBW[j][i]){
-                        
+            if (RGBW_write[j][i] < RGBWBrightnessAdjusted[j][i])
+            {
+
                 if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
 
                     _lastMillis_AnimateColors[j][i] = micros();
                     RGBW_write[j][i]++;
                 }
-            }else if(RGBW_write[j][i] > RGBW[j][i]){
-                
+            }
+            else if (RGBW_write[j][i] > RGBWBrightnessAdjusted[j][i])
+            {
+
                 if (micros() - _lastMillis_AnimateColors[j][i] >= fadems[j][i]){
 
                     _lastMillis_AnimateColors[j][i] = micros();
                     RGBW_write[j][i]--;
-                }             
+                }
             }
             // else{
                 // RGBW_write[j][i] = RGBW[j][i];
                 //animate_color_is_not_Blocking = true;
             // }
-        }else if(RGBW_write[j][i] != RGBW[j][i]){
-            
-            RGBW_write[j][i] = RGBW[j][i];
+        }
+        else if (RGBW_write[j][i] != RGBWBrightnessAdjusted[j][i])
+        {
+
+            RGBW_write[j][i] = RGBWBrightnessAdjusted[j][i];
         }
     }
 

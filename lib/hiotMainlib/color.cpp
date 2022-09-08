@@ -11,15 +11,11 @@ void ColorObj::setup(){
     FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
     // leds[0] = CRGB::Red; 
     // FastLED.show(); 
-    // strip.Begin();
-    // strip.Show();
-
-    // ICH BIN DDDDDDDDDDDDDD
-    // ICH BIN TEST
 
 }
 void ColorObj::loop(){
     effect();
+    adjustBrightnessColor();
     animateColor();
     writeColor();
 }
@@ -320,8 +316,24 @@ void ColorObj::effect(){
             break;
     }
 }
+void ColorObj::adjustBrightnessColor()
+{
 
+    // if (millis() - _lastMillis_adjustbrightness > 1000)
+    // {
+    //     _lastMillis_adjustbrightness = millis();
+        // for (int i = 0; i < ledAmmount; i++)
+        // {
+        //     for (int j = 0; j < pinAmount; j++)
+        //     {
+        //         RGBWBrightnessAdjusted[i][j] = RGBW[i][j];
 
+        //         float buf = RGBWBrightnessAdjusted[i][j] / 255;
+        //         Serial.println(buf);
+        //     }
+        // }
+    // }
+}
 //calculating time for each increment
 void ColorObj::animateColor(){
     int i = _countAnimateColor;

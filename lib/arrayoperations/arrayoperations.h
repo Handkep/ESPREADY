@@ -3,10 +3,15 @@
 #include <Arduino.h>
 #define LENGTHOF2NDARRAY 4
 // used for print colors on the console
+void reversearr(uint8_t (*arr)[LENGTHOF2NDARRAY], size_t len);
+
+void rotatearrleft(uint8_t (*arr)[LENGTHOF2NDARRAY], size_t n, size_t len);
+void rotatearrright(uint8_t (*arr)[LENGTHOF2NDARRAY], size_t n, size_t len);
+
+
 void reversearr(int (*arr)[LENGTHOF2NDARRAY], size_t len);
 
 void rotatearrleft(int (*arr)[LENGTHOF2NDARRAY], size_t n, size_t len);
 void rotatearrright(int (*arr)[LENGTHOF2NDARRAY], size_t n, size_t len);
-
 
 #endif

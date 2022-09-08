@@ -80,24 +80,27 @@ class ColorObj
         void setColorString(String color);
         String getColorStringRGB(int i);
         String getColorStringRGBW(int i);
+        void adjustBrightnessColor();
+        int currentBrightness;
         void loop();
         int calculatems(int speed, int current_colors, int next_colors);
         #define LEDAMMOUNT 74
 
-        const int ledAmmount = LEDAMMOUNT;
+        int ledAmmount = LEDAMMOUNT;
         CRGB leds[NUM_LEDS];
 
         int RGB_Pin[3];  
         int RGBW_Pin[4];
-        int RGB[LEDAMMOUNT][3];
-        int RGBW[LEDAMMOUNT][4];
-        int RGB_write[LEDAMMOUNT][3];
-        int RGBW_write[LEDAMMOUNT][4];
+        uint8_t RGB[LEDAMMOUNT][3];
+        uint8_t RGBW[LEDAMMOUNT][4];
+        uint8_t RGBWBrightnessAdjusted[LEDAMMOUNT][4];
+        uint8_t RGB_write[LEDAMMOUNT][3];
+        uint8_t RGBW_write[LEDAMMOUNT][4];
         unsigned long fade_micros[4];
         unsigned long fade_millis; //could be deleted
         int pinAmount;
-        int jumpcolors[3][4] = {{255,0,0,0},{0,255,0,0},{0,0,255,0}};
-        int strobecolors[2][4] = {{255,255,255,255},{0,0,0}};
+        uint8_t jumpcolors[3][4] = {{255,0,0,0},{0,255,0,0},{0,0,255,0}};
+        uint8_t strobecolors[2][4] = {{255, 255, 255, 255}, {0, 0, 0}};
         int jumplen = 3;
         int strobelen = 2;
         int currentEffect;
@@ -122,6 +125,7 @@ class ColorObj
         int effectIndex;
         void animateColor();
         void writeColor();
+        // unsigned long _lastMillis_adjustbrightness;
         unsigned long _lastMillis_writeColor_neopixelbus;
         int _countAnimateColor;
         int _countWriteColor;

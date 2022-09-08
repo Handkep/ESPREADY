@@ -69,20 +69,20 @@ void HiotDevice::setup(){
     // colors.setColorString("255,255,255");
     backupColor = "255,255,255";
     alertBlink(5, 30,5);
-    logSerial("START",0);
-    logSerial("TEST",1);
-    logSerial("TEST",2);
-    logSerial("TEST",3);
+    logSerial(F("START"), 0);
+    logSerial(F("TEST"), 1);
+    logSerial(F("TEST"), 2);
+    logSerial(F("TEST"), 3);
     // delay(1000);
-    Serial.write(27);       // ESC command
-    Serial.print("[2J");    // clear screen command
-    Serial.write(27);
-    Serial.print("[H");
-    Serial.println("HH   HH   AAA   NN   NN DDDDD   KK  KK EEEEEEE    IIIII  OOOOO  TTTTTTT \nHH   HH  AAAAA  NNN  NN DD  DD  KK KK  EE          III  OO   OO   TTT \nHHHHHHH AA   AA NN N NN DD   DD KKKK   EEEEE       III  OO   OO   TTT \nHH   HH AAAAAAA NN  NNN DD   DD KK KK  EE          III  OO   OO   TTT \nHH   HH AA   AA NN   NN DDDDDD  KK  KK EEEEEEE    IIIII  OOOO0    TTT ");
+    // Serial.write(27);       // ESC command
+    // Serial.print("[2J");    // clear screen command
+    // Serial.write(27);
+    // Serial.print("[H");
+    Serial.println(F("HH   HH   AAA   NN   NN DDDDD   KK  KK EEEEEEE    IIIII  OOOOO  TTTTTTT \nHH   HH  AAAAA  NNN  NN DD  DD  KK KK  EE          III  OO   OO   TTT \nHHHHHHH AA   AA NN N NN DD   DD KKKK   EEEEE       III  OO   OO   TTT \nHH   HH AAAAAAA NN  NNN DD   DD KK KK  EE          III  OO   OO   TTT \nHH   HH AA   AA NN   NN DDDDDD  KK  KK EEEEEEE    IIIII  OOOO0    TTT "));
     colors.setup();
-    logSerial("colors.setup",3);
+    logSerial(F("colors.setup"), 3);
     loadConfig();
-    logSerial("config",0);
+    logSerial(F("config"), 0);
     // topic_color = insertHostnameintoVariable(topic_color);
     topic_cmd_json = insertHostnameintoVariable(topic_cmd_json);
     // topic_mode = insertHostnameintoVariable(topic_mode);
@@ -95,7 +95,7 @@ void HiotDevice::setup(){
     topic_STATE = insertHostnameintoVariable(topic_STATE);
     topic_interrupt = insertHostnameintoVariable(topic_interrupt);
     topic_fadespeed = insertHostnameintoVariable(topic_fadespeed);
-    logSerial("topics",0);
+    logSerial(F("topics"), 0);
 
     if(conf.useBME280){
         topic_bme_temperature = insertHostnameintoVariable(topic_bme_temperature);
@@ -116,14 +116,14 @@ void HiotDevice::setup(){
         topic_irrigation_Zone8 = insertHostnameintoVariable(topic_irrigation_Zone8);
         
         PCF.begin();
-        logSerial("Enabling PCF",3);
+        logSerial(F("Enabling PCF"), 3);
         // for(int i = 0; i<8;i++){
         //     PCF.write(i,LOW);
         //     delay(100);
         //     PCF.write(i,HIGH);
         //     delay(100);
         // }
-        logSerial("Tested Relays",0);
+        logSerial(F("Tested Relays"), 0);
     }
 
     
@@ -198,7 +198,7 @@ void HiotDevice::setLEDPins(int R, int G, int B, int W){
 void HiotDevice::setLEDPinsRGBW(int R, int G, int B, int W){
 
     colors.pinAmount = 4;    
-    colors.ledAmmount=1;
+    // colors.ledAmmount=1;
 	pinMode(R,OUTPUT);
 	pinMode(G,OUTPUT);
 	pinMode(B,OUTPUT);
@@ -217,6 +217,9 @@ void HiotDevice::setLEDPinsRGBW(int R, int G, int B, int W){
 String HiotDevice::insertHostnameintoVariable(String topic)
 {
     String buf(String(conf.espHostname) + topic);
+    // const char* buffer = conf.espHostname + topic.c_str()
+    // char* buffer;
+    // strncpy(buffer, topic.c_str(), sizeof(topic.c_str()));
     logSerial(buf,0);
     return buf;
 }
@@ -241,16 +244,16 @@ void HiotDevice::connectToWifi(){
             alertBlink(5, 500,1);
             if(millis() - _millis_connectToWifi >= WIFI_TIMEOUT){
                 // Serial.print("\r");
-                Serial.print("\r                                                    \r");
+                Serial.print(F("\r                                                    \r"));
                 // Serial.print("\r");
-                logSerial("no Wifi found, try again in 20s\r",ERROR,false);
+                logSerial(F("no Wifi found, try again in 20s\r"), ERROR, false);
                 delay(20000);
-                Serial.print("\r                                                    \r");
+                Serial.print(F("\r                                                    \r"));
                 _millis_connectToWifi = millis();
             }
         }
         // Serial.println();
-        Serial.print("\r                                                    \r");
+        Serial.print(F("\r                                                    \r"));
         logSerial(String("Connected to Wifi at ")+String(conf.ssid),4);
         logSerialPretty("Wifi-Info",String("IP: ") + String(WiFi.localIP().toString()) + String("\n") + 
                         String("Hostname: ") + WiFi.hostname() + String("\n") + 
@@ -284,7 +287,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
     if(recvTopic == topic_cmd_json){
         StaticJsonDocument<512> doc;
         DeserializationError error = deserializeJson(doc, recvPayload);
-        if(error)logSerial("deserialization",2);
+        if(error)logSerial(F("deserialization"),2);
         // logSerial("printing json payload serial",0);
         // serializeJsonPretty(doc, Serial);
         // Serial.println();
@@ -309,31 +312,51 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
                     // esp.publish(topic_power_state.c_str(),recvPayload.c_str());
                     logSerial(String(colors.currentEffect),0);
                     logSerial(String(backupEffect),0);
-                    logSerial("OFF to ON",0);
+                    logSerial(F("OFF to ON"), 0);
                     esp.publish(topic_state_json.c_str(),"{\"state\": \"ON\"}");
                 }
             }    
         } 
-        if(doc.containsKey("color")) {
+        if(doc.containsKey(F("color"))) {
             StaticJsonDocument<512> colordoc;
             String jsonbuf = doc["color"];
             DeserializationError error = deserializeJson(colordoc, jsonbuf);
-            if(error)logSerial("deserialization",2);
+            if(error)
+                logSerial(F("deserialization"), 2);
             if(colordoc.containsKey("r") && colordoc.containsKey("g") && colordoc.containsKey("b")){
-                String colorbuf = String(colordoc["r"]) + "," + String(colordoc["g"]) + "," + String(colordoc["b"]);
-                // String colorbuf = colordoc["r"] + "," + colordoc["g"] + "," + colordoc["b"];
-                colors.setColorString(colorbuf);
-                String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"effect\": \"none\", \"color\":" + String(doc["color"]) + "}";
-                
+                // String colorBuffer = String(colordoc["r"]) + "," + String(colordoc["g"]) + "," + String(colordoc["b"]); 36296 36312
+
+                char colorBuffer[15]; 
+                sprintf(colorBuffer, "%d,%d,%d", colordoc["r"].as<int>(), colordoc["g"].as<int>(), colordoc["b"].as<int>());
+
+                logSerial(colorBuffer, 2);
+                colors.setColorString(String(colorBuffer));
+                String colorJsonbuff = F("{\"state\": \"ON\", \"color_mode\": \"rgb\", \"effect\": \"none\", \"color\":") + String(doc["color"]) + "}";
+
                 esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
             }
         }
-        if(doc.containsKey("fadespeed")){
+        if (doc.containsKey(F("brightness")))
+        {
+            // Serial.println(String(doc["brightness"]).toInt());
+            // colors.currentBrightness = String(doc["brightness"]).toInt();
+            // String colorJsonbuff = "{\"state\": \"ON\",  \"brightness\": " + String(doc["brightness"]) + "}";
+            // esp.publish(topic_state_json.c_str(), colorJsonbuff.c_str());
+            // if (brightnessdoc.containsKey("r") && brightnessdoc.containsKey("g") && brightnessdoc.containsKey("b"))
+            // {
+            //     String brightnessbuf = String(brightnessdoc["r"]) + "," + String(brightnessdoc["g"]) + "," + String(brightnessdoc["b"]);
+            //     // String colorbuf = colordoc["r"] + "," + colordoc["g"] + "," + colordoc["b"];
+            //     colors.setColorString(brightnessbuf);
+            //     String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"effect\": \"none\", \"color\":" + String(doc["color"]) + "}";
+
+            // }
+        }
+        if(doc.containsKey(F("fadespeed"))){
             colors.fadespeed = doc["fadespeed"];
             esp.publish(topic_fadespeed.c_str(),String(colors.fadespeed).c_str());
             colors.fadespeed = pow(colors.fadespeed,3)/50;
         }
-        if(doc.containsKey("effect")){
+        if(doc.containsKey(F("effect"))){
             if(doc["effect"] == "JUMP" || doc["effect"] == "1") colors.currentEffect = 1;
             if(doc["effect"] == "FADE" || doc["effect"] == "2") colors.currentEffect = 2;
             if(doc["effect"] == "STROBE" || doc["effect"] == "3") colors.currentEffect = 3;
@@ -360,13 +383,13 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
     t_httpUpdate_return ret = ESPhttpUpdate.update(espClient, "192.168.2.115", 5000, "/esp", "v1.0.1");
     switch(ret) {
         case HTTP_UPDATE_FAILED:
-            logSerial("Update failed", ERROR);
+            logSerial(F("Update failed"), ERROR);
             break;
         case HTTP_UPDATE_NO_UPDATES:
-            logSerial("no update", INFO);
+            logSerial(F("no update"), INFO);
             break;
         case HTTP_UPDATE_OK:
-            Serial.println("[update] Update ok."); // may not be called since we reboot the ESP
+            Serial.println(F("[update] Update ok.")); // may not be called since we reboot the ESP
             break;
     }
 
@@ -377,7 +400,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
                 colors.isColorOnOrOff = 0;
                 colors.setColorString("0,0,0");
                 esp.publish(topic_power_state.c_str(),recvPayload.c_str());
-                logSerial("ON to OFF",0);
+                logSerial(F("ON to OFF"), 0);
             }   
         }else{
             if(recvPayload == "ON"){
@@ -385,7 +408,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
                 colors.setColorString(backupColor);
                 colors.currentEffect = backupEffect;
                 esp.publish(topic_power_state.c_str(),recvPayload.c_str());
-                logSerial("OFF to ON",0);
+                logSerial(F("OFF to ON"), 0);
             }
         }
     }else if(recvTopic == topic_interrupt){
@@ -401,7 +424,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
                 esp.publish(topic_power_state.c_str(),recvPayload.c_str());
             }   
     }else if(recvTopic.substring(0, recvTopic.length()-1) == topic_irrigation_Zone1.substring(0, topic_irrigation_Zone1.length()-1) && conf.usePCF8574){
-        logSerial("TRIGERED RELAYYY YAYY",0);
+        logSerial(F("TRIGERED RELAYYY YAYY"), 0);
         if(recvTopic == topic_irrigation_Zone1){
             if(recvPayload == "ON"){
                 PCF.write(0,LOW);
@@ -464,12 +487,12 @@ void HiotDevice::connectToMQTT(){
         esp.setServer(conf.mqttBrokerIp,conf.mqttBrokerPort);
         esp.setCallback(std::bind( &HiotDevice::mqttCallback, this, _1,_2,_3));
 
-        logSerial(String("(Re)Connectig to MQTT at ")+String(conf.mqttBrokerIp)+ "  "+String(esp.state()),3);
+        logSerial(String(F("(Re)Connectig to MQTT at ")) + String(conf.mqttBrokerIp) + "  " + String(esp.state()), 3);
         // logSerial(String(esp.state()),2);
         // if(esp.connect(conf.espHostname, topic_LWT.c_str(),2,true,"offline")){
         if(esp.connect(conf.espHostname, conf.mqttBrokerUser , conf.mqttBrokerPassword ,topic_LWT.c_str(),2,true,"offline")){
-            
-            logSerial("Connected to MQTT",4);
+
+            logSerial(F("Connected to MQTT"), 4);
             alertBlink(10,100,4);
             esp.publish(topic_LWT.c_str(),"online",true);
             if(conf.enableLEDs){
@@ -535,7 +558,7 @@ void HiotDevice::publishBMETemp(){
     {
         _millis_publishBMETemp = millis();
         if (! sensor.begin(0x76, &Wire)) {
-            logSerial("Could not find a valid BME280 sensor, check wiring!",2);
+            logSerial(F("Could not find a valid BME280 sensor, check wiring!"), 2);
         }else{
             char buffer[15];
             String buf = String(sensor.readTemperature()) + " ; " + String(sensor.readHumidity());

@@ -169,7 +169,14 @@ void HiotDevice::setLEDPins(int R, int G, int B){
         colors.RGBW_write[i][0] = 255;
         colors.RGBW_write[i][1] = 255;
         colors.RGBW_write[i][2] = 255;
+        RgbColor red(colors.RGBW_write[i][0], colors.RGBW_write[i][1], colors.RGBW_write[i][2]);
+        // strip.SetPixelColor(j,red);
+        colors.leds[i].setRGB(colors.RGBW_write[i][0], colors.RGBW_write[i][1], colors.RGBW_write[i][2]);
+        Serial.println(colors.leds[i]);
     }
+    // strip.Show();
+    FastLED.show();
+
     colors.RGBW_Pin[0] = R;
     colors.RGBW_Pin[1] = G;
     colors.RGBW_Pin[2] = B;
@@ -210,6 +217,7 @@ void HiotDevice::setLEDPinsRGBW(int R, int G, int B, int W){
     colors.RGBW_Pin[1] = G;
     colors.RGBW_Pin[2] = B;
     colors.RGBW_Pin[3] = W;
+
 
 }
 
@@ -331,6 +339,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
 
                 logSerial(colorBuffer, 2);
                 colors.setColorString(String(colorBuffer));
+                colors.adjustBrightnessColor();
                 String colorJsonbuff = F("{\"state\": \"ON\", \"color_mode\": \"rgb\", \"effect\": \"none\", \"color\":") + String(doc["color"]) + "}";
 
                 esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
@@ -341,6 +350,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             colors.currentBrightness = doc["brightness"].as<uint8_t>();
             char brightnessBuffer[40];
             sprintf(brightnessBuffer, "{\"state\": \"ON\",  \"brightness\":%d}", colors.currentBrightness);
+            colors.adjustBrightnessColor();
             esp.publish(topic_state_json.c_str(), brightnessBuffer);
             logSerial(String(brightnessBuffer), 2);
         }

@@ -15,7 +15,7 @@ void ColorObj::setup(){
 }
 void ColorObj::loop(){
     effect();
-    adjustBrightnessColor();
+    // adjustBrightnessColor();
     animateColor();
     writeColor();
 }
@@ -318,7 +318,6 @@ void ColorObj::effect(){
 }
 void ColorObj::adjustBrightnessColor()
 {
-
     if (millis() - _lastMillis_adjustbrightness > 100)
     {
         _lastMillis_adjustbrightness = millis();

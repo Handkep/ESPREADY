@@ -418,10 +418,16 @@ void ColorObj::writeColor(){
     if(conf.useWS2812){
         if(millis() - _lastMillis_writeColor_neopixelbus > 1000/60){
             _lastMillis_writeColor_neopixelbus = millis();
+
+
+
             for(int j = 0; j < ledAmmount;j++){
-                RgbColor red(RGBW_write[j][0], RGBW_write[j][1], RGBW_write[j][2]);
+                // RgbColor red(RGBW_write[j][0], RGBW_write[j][1], RGBW_write[j][2]);
                 // strip.SetPixelColor(j,red);
+
+
                 leds[j].setRGB(RGBW_write[j][0], RGBW_write[j][1], RGBW_write[j][2]);
+                // leds[j].setRGB(pixeltest[j][0], pixeltest[j][1], pixeltest[j][2]);
             }
             // strip.Show();
             FastLED.show(); 

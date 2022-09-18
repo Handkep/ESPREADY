@@ -7,8 +7,8 @@ WiFiClient espClient;
 PubSubClient esp(espClient);
 Config conf;
 PCF8574 PCF(0x20);
-
-
+WiFiUDP Udp;
+char packet[30];
 
 String topic_debug = "/debug";
 // String topic_color = "/cmd/color";
@@ -58,6 +58,59 @@ void HiotDevice::loop(){
     if(conf.useBME280)publishBMETemp();
     // checkforPins();
     // delay(100);
+
+    int packetSize = Udp.parsePacket();
+    if (packetSize)
+    {
+        // Serial.print("Received packet! Size: ");
+        // Serial.println(packetSize);
+        int len = Udp.read(packet, 255);
+        if (len > 0)
+        {
+            packet[len] = '\0';
+        }
+        // Serial.print("Packet received: ");
+        // Serial.println(packet);
+        String buf = packet;
+        // buf.trim(" ");
+        // Serial.println(buf);
+        // int fi =buf.indexOf(",");
+        // int si =buf.indexOf(",",fi+1);
+        // int ti =buf.indexOf(",",si+1);
+        // Serial.println(fi);
+        // Serial.println(si);
+        // Serial.println(ti);
+        // char r[3] = "";
+        // for(size_t i=0;i< packetSize;i++)
+        // {
+        //     if(packet[i]=='['){
+        //         // Serial.println(packet[i]);
+        //         continue;
+        //     }
+        //     else if (packet[i] == ')')
+        //     {
+        //         break;
+        //     }
+        //     if(i<fi)
+        //     {
+        //         r[i]=packet[i];
+        //         Serial.println("Asdf");
+        //     }
+        // }
+        // Serial.println(r);
+        StaticJsonDocument<80> doc;
+        deserializeJson(doc,packet);
+        // serializeJsonPretty(doc, Serial);+
+        uint8_t r = doc["r"];
+        uint8_t g = doc["g"];
+        uint8_t b = doc["b"];
+        uint8_t i = doc["i"];
+        // colors.RGBW_write[i][0] = r;
+        // colors.RGBW_write[i][1] = g;
+        // colors.RGBW_write[i][2] = b;
+        // Serial.println(doc["r"]);
+        // Serial.printf("r%d g%d b%d i%d\n\n",r,g,b,i);
+    }
 }
 
 // funcsetup
@@ -276,6 +329,7 @@ void HiotDevice::connectToWifi(){
         }else{
             logSerial("MDNS", ERROR);
         }
+        Udp.begin(UDP_PORT);
     }
 }
 
@@ -365,6 +419,10 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             if(doc[F("effect")] == F("STROBE") || doc[F("effect")] == F("3")) colors.currentEffect = 3;
             if(doc[F("effect")] == F("RAINBOW") || doc[F("effect")] == F("4")) colors.currentEffect = 4;
             if(doc[F("effect")] == F("EFFECTTEST") || doc[F("effect")] == F("5")) colors.currentEffect = 5;
+        }
+        if (doc.containsKey(F("pixels")))
+        {
+            // Serial.println(String(doc));
         }
 
         // |power|

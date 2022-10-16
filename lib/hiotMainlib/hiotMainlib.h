@@ -85,7 +85,7 @@ class ColorObj
         String getColorStringRGB(int i);
         String getColorStringRGBW(int i);
         void adjustBrightnessColor();
-        uint8_t currentBrightness;
+        uint8_t currentBrightness = 255;
         void loop();
         int calculatems(int speed, int current_colors, int next_colors);
         #define LEDAMMOUNT 74

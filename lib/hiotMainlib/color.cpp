@@ -92,7 +92,7 @@ void ColorObj::setColorString(String color){
             fadems[j][i] = calculatems(1000000, RGBW[j][i], RGBW_write[j][i]);
         }
     }
-
+    adjustBrightnessColor();
 }
 String ColorObj::getColorStringRGB(int i){
     return String(RGB_write[i][0]) + String(",") + String(RGB_write[i][1]) + String(",") + String(RGB_write[i][2]);
@@ -104,7 +104,7 @@ String ColorObj::getColorStringRGBW(int i){
 
 void ColorObj::jump(){
     if(millis() - _millis_Effect >= fadespeed){
-        // Serial.println("CHANGING COLOR");
+        Serial.println("CHANGING COLOR");
         _millis_Effect = millis();
         for(int j = 0; j < ledAmmount ; j++ ){
             for (int i = 0; i < pinAmount;i++){
@@ -112,6 +112,7 @@ void ColorObj::jump(){
                 fadems[j][i] = 0;
             }
         }
+        adjustBrightnessColor();
         effectIndex++;
         if(effectIndex>=jumplen){
             effectIndex = 0;
@@ -119,7 +120,7 @@ void ColorObj::jump(){
     }
 }
 
-void ColorObj::strobe(){
+void ColorObj::strobe(){ // neorainbow
 
     if(millis() - _millis_Effect >= fadespeed){
         // Serial.println("CHANGING COLOR");
@@ -132,6 +133,8 @@ void ColorObj::strobe(){
                 // fadems[j][i] = calculatems(fadespeed*3000,255,0);
             }
         }
+        adjustBrightnessColor();
+
         CHSV hsv( basecolorspectrum, 255, 255); // pure blue in HSV Spectrum space
         CRGB rgb;
         hsv2rgb_spectrum( hsv, rgb);
@@ -230,6 +233,7 @@ void ColorObj::fade(){
                 fadems[j][i] = calculatems(fadespeed*1000, RGBW[j][i], RGBW_write[j][i]);
             }
         }
+        adjustBrightnessColor();
         effectIndex++;
         if(effectIndex>=jumplen){
             effectIndex = 0;
@@ -259,6 +263,7 @@ void ColorObj::rainbow(){
         }
 
         rotatearrleft(RGBW,1,ledAmmount);
+        adjustBrightnessColor();
 
         effectIndex++;
         if(effectIndex>=jumplen){
@@ -311,20 +316,20 @@ void ColorObj::effect(){
         case 5:
             effecttest();
             break;
-        
         default:
             break;
     }
 }
 void ColorObj::adjustBrightnessColor()
 {
-    if (millis() - _lastMillis_adjustbrightness > 100)
-    {
-        _lastMillis_adjustbrightness = millis();
+    // if (millis() - _lastMillis_adjustbrightness > 100)
+    // {
+        // _lastMillis_adjustbrightness = millis();
+        Serial.print("current Brightness: ");
+        Serial.println(currentBrightness);
         for (int i = 0; i < ledAmmount; i++)
         {
             // int i = 0;
-                // Serial.println("adf");
             for (int j = 0; j < pinAmount; j++)
             {
                 RGBWBrightnessAdjusted[i][j] = RGBW[i][j];
@@ -332,10 +337,11 @@ void ColorObj::adjustBrightnessColor()
                 float buf = (float)RGBWBrightnessAdjusted[i][j] / 255;
                 buf *= currentBrightness;
                 RGBWBrightnessAdjusted[i][j] = (uint8_t)roundf(buf);
+                // fadems[j][i] = calculatems(1000000, RGBW[j][i], RGBWBrightnessAdjusted[i][j]);
                 // Serial.println(RGBWBrightnessAdjusted[i][j]);
             }
         }
-    }
+    // }
 }
 //calculating time for each increment
 void ColorObj::animateColor(){

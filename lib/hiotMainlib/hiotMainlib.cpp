@@ -393,7 +393,8 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
 
                 logSerial(colorBuffer, 2);
                 colors.setColorString(String(colorBuffer));
-                colors.adjustBrightnessColor();
+                // colors.adjustBrightnessColor();
+                // Serial.println(colors.currentBrightness);
                 String colorJsonbuff = F("{\"state\": \"ON\", \"color_mode\": \"rgb\", \"effect\": \"none\", \"color\":") + String(doc["color"]) + "}";
 
                 esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
@@ -401,6 +402,8 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
         }
         if (doc.containsKey(F("brightness")))
         {
+            Serial.print("Setting Brightness: ");
+            Serial.println(colors.currentBrightness);
             colors.currentBrightness = doc["brightness"].as<uint8_t>();
             char brightnessBuffer[40];
             sprintf(brightnessBuffer, "{\"state\": \"ON\",  \"brightness\":%d}", colors.currentBrightness);
@@ -412,6 +415,7 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             colors.fadespeed = doc["fadespeed"];
             esp.publish(topic_fadespeed.c_str(),String(colors.fadespeed).c_str());
             colors.fadespeed = pow(colors.fadespeed,3)/50;
+            Serial.println(colors.fadespeed);
         }
         if(doc.containsKey(F("effect"))){
             if(doc[F("effect")] == F("JUMP") || doc[F("effect")] == F("1")) colors.currentEffect = 1;
@@ -419,6 +423,9 @@ void HiotDevice::mqttCallback(char* topic, byte* payload, int length){
             if(doc[F("effect")] == F("STROBE") || doc[F("effect")] == F("3")) colors.currentEffect = 3;
             if(doc[F("effect")] == F("RAINBOW") || doc[F("effect")] == F("4")) colors.currentEffect = 4;
             if(doc[F("effect")] == F("EFFECTTEST") || doc[F("effect")] == F("5")) colors.currentEffect = 5;
+
+            String colorJsonbuff = "{\"state\": \"ON\", \"effect\":\"" + String(doc[F("effect")]) + "}";
+            esp.publish(topic_state_json.c_str(), colorJsonbuff.c_str());
         }
         if (doc.containsKey(F("pixels")))
         {
@@ -553,7 +560,7 @@ void HiotDevice::connectToMQTT(){
                 // esp.subscribe(topic_power.c_str());
                 esp.subscribe(topic_interrupt.c_str());
                 esp.publish(topic_fadespeed.c_str(),"45");
-                String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"color\":" + getESPColorJson() + "}";
+                String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \" brightness \": 255, \"color\":" + getESPColorJson() + "}";
                 // String colorJsonbuff = "{\"state\": \"ON\", \"color_mode\": \"rgb\", \"brightness\": 255, \"color\":{ \"r\": 255, \"g\": 255, \"b\":255}";
                 esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
                 esp.publish(topic_power_state.c_str(),"ON",true);
@@ -596,7 +603,8 @@ void HiotDevice::publishESPStateJsonRepetitive(){
                 if(colors.currentEffect == 3) effectbuff = "STROBE";
                 if(colors.currentEffect == 4) effectbuff = "RAINBOW";
                 if(colors.currentEffect == 5) effectbuff = "EFFECTTEST";
-                String colorJsonbuff = "{\"state\": \"ON\", \"effect\":\"" + effectbuff + "\", \"color_mode\": \"rgb\", \"color\":" + getESPColorJson() + "}";
+                // String colorJsonbuff = "{\"state\": \"ON\", \"effect\":\"" + effectbuff + "\", \"color_mode\": \"rgb\", \"color\":" + getESPColorJson() + "}";
+                String colorJsonbuff = "{\"state\": \"ON\", \"effect\":\"" + effectbuff + "\", \"color\":" + getESPColorJson() + "}";
                 esp.publish(topic_state_json.c_str(),colorJsonbuff.c_str());
             }
         }
